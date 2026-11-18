@@ -299,10 +299,7 @@ function daysWord(n) {
 }
 
 function tile(def, body, item) {
-  const stale =
-    item && Date.now() - Date.parse(item.checkedAt) > STALE_AFTER
-      ? `<p class="note warn">⚠ не обновлялось с ${fmtDate(item.checkedAt.slice(0, 10), { day: "numeric", month: "long" })}</p>`
-      : "";
+  const stale = item && isStale(item) ? `<p class="note warn">⚠ не обновлялось с ${fmtDay(item.checkedAt.slice(0, 10))}</p>` : "";
   const src = item ? `<a class="tile-src" href="${esc(item.url)}" target="_blank" rel="noopener">Источник: ${esc(item.source)}</a>` : "";
   return `<article class="tile">
     <h4 class="tile-label">${def.title} <span class="tile-region">· ${def.region}</span> ${tipButton(def.hint)}</h4>
@@ -310,13 +307,17 @@ function tile(def, body, item) {
   </article>`;
 }
 
+// Сколько дней от сегодняшнего дня до даты «2026-11-25» (0 — сегодня, отрицательное — уже прошло).
+const daysUntil = (iso) => Math.round((Date.parse(`${iso}T12:00:00`) - Date.parse(`${isoToday()}T12:00:00`)) / DAY);
+const isStale = (item) => Date.now() - Date.parse(item.checkedAt) > STALE_AFTER;
+const fmtDay = (iso) => fmtDate(iso, { day: "numeric", month: "long" });
+
 function nextMeeting(m) {
-  const today = isoToday();
-  const next = m?.dates.find((d) => d >= today);
+  const next = m?.dates.find((d) => daysUntil(d) >= 0);
   if (!next) return `<p class="tile-next">Следующее решение: нет данных</p>`;
-  const days = Math.round((Date.parse(`${next}T12:00:00`) - Date.parse(`${today}T12:00:00`)) / DAY);
+  const days = daysUntil(next);
   const when = days === 0 ? "сегодня" : days === 1 ? "завтра" : `через ${days}${NBSP}${daysWord(days)}`;
-  return `<p class="tile-next">Следующее решение: <strong>${fmtDate(next, { day: "numeric", month: "long" })}</strong> (${when})</p>`;
+  return `<p class="tile-next">Следующее решение: <strong>${fmtDay(next)}</strong> (${when})</p>`;
 }
 
 function rateTile(def, items) {
@@ -336,16 +337,93 @@ function macroTile(def, items) {
   return tile(def, body, x);
 }
 
+// ---------- Что ждать ----------
+
+const EVENT_DAYS = 7;
+const RATE_HINT = "Центробанк решает, менять ли ставку. В такой день валюты и акции часто сильно двигаются.";
+const meetings = (title) => (x) => x.dates.map((date) => ({ date, title, hint: RATE_HINT }));
+// Откуда берутся события. Порядок важен: внутри одного дня события идут в этом же порядке.
+const EVENT_SOURCES = [
+  { key: "fedMeetings", kind: "Ставка", what: "заседания ФРС", src: "ФРС", events: meetings("Решение по ставке ФРС (США)") },
+  { key: "ecbMeetings", kind: "Ставка", what: "заседания ЕЦБ", src: "ЕЦБ", events: meetings("Решение по ставке ЕЦБ (еврозона)") },
+  { key: "nbpMeetings", kind: "Ставка", what: "заседания НБП", src: "НБП", events: meetings("Решение по ставке НБП (Польша)") },
+  { key: "usReleases", kind: "Данные", what: "статистика США", src: "FRED", events: (x) => x.events },
+  { key: "euReleases", kind: "Данные", what: "статистика еврозоны", src: "Eurostat", events: (x) => x.events },
+  {
+    key: "earnings",
+    kind: "Отчёт",
+    what: "отчёты компаний",
+    src: "Nasdaq",
+    events: (x) => x.events.map((e) => ({ date: e.date, title: `${e.name} — отчёт за квартал`, hint: e.when && `Время: ${e.when}` })),
+  },
+];
+
+function dayTitle(iso) {
+  const label = fmtDate(iso, { weekday: "long", day: "numeric", month: "long" });
+  const days = daysUntil(iso);
+  if (days === 0) return `Сегодня, ${label}`;
+  if (days === 1) return `Завтра, ${label}`;
+  return label[0].toUpperCase() + label.slice(1);
+}
+
+function renderEvents(items) {
+  const events = [];
+  const notes = [];
+  const sources = [];
+  for (const s of EVENT_SOURCES) {
+    const x = items[s.key];
+    if (!x) {
+      notes.push(`нет данных: ${s.what} — источник не ответил`);
+      continue;
+    }
+    if (isStale(x)) notes.push(`⚠ ${s.what}: не обновлялось с ${fmtDay(x.checkedAt.slice(0, 10))}`);
+    sources.push(`<a href="${esc(x.url)}" target="_blank" rel="noopener">${s.src}</a>`);
+    for (const e of s.events(x)) {
+      const days = daysUntil(e.date);
+      if (days >= 0 && days <= EVENT_DAYS) events.push({ ...e, kind: s.kind });
+    }
+  }
+  events.sort((a, b) => a.date.localeCompare(b.date)); // сортировка устойчивая, порядок источников внутри дня сохраняется
+
+  const days = new Map();
+  for (const e of events) days.set(e.date, [...(days.get(e.date) || []), e]);
+  if (!sources.length) {
+    $("events").innerHTML = `<p class="ev-empty">нет данных — календарь не загрузился</p>`;
+    $("events-notes").innerHTML = $("events-src").innerHTML = "";
+    return;
+  }
+  $("events").innerHTML = days.size
+    ? [...days]
+        .map(
+          ([date, list]) => `<div class="ev-day">
+      <h3 class="ev-date">${dayTitle(date)}</h3>
+      <ul class="ev-list">${list
+        .map(
+          (e) => `<li class="ev">
+        <span class="ev-kind">${e.kind}</span>
+        <div><p class="ev-title">${esc(e.title)}</p>${e.hint ? `<p class="ev-hint">${esc(e.hint)}</p>` : ""}</div>
+      </li>`,
+        )
+        .join("")}</ul>
+    </div>`,
+        )
+        .join("")
+    : `<p class="ev-empty">На ближайшие ${EVENT_DAYS}${NBSP}дней важных событий не нашлось.</p>`;
+  $("events-notes").innerHTML = notes.map((n) => `<p class="note${n.startsWith("⚠") ? " warn" : ""}">${n}</p>`).join("");
+  $("events-src").innerHTML = sources.length ? `Источники: ${sources.join(", ")}.` : "";
+}
+
 function renderDaily(failed) {
   const items = daily?.items || {};
   $("rates-tiles").innerHTML = RATE_TILES.map((d) => rateTile(d, items)).join("");
   $("macro-tiles").innerHTML = MACRO_TILES.map((d) => macroTile(d, items)).join("");
+  renderEvents(items);
   const line = $("daily-line");
   line.classList.toggle("ok", !failed);
   line.classList.toggle("error", failed);
   $("daily-text").textContent = failed
-    ? "Ставки и инфляция: не удалось загрузить данные."
-    : `Ставки и инфляция обновлены: ${fmtFull(Date.parse(daily.generatedAt))} (раз в день)`;
+    ? "Ставки, инфляция и календарь: не удалось загрузить данные."
+    : `Ставки, инфляция и календарь обновлены: ${fmtFull(Date.parse(daily.generatedAt))} (раз в день)`;
 }
 
 async function loadDaily() {

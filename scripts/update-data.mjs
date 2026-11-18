@@ -1,4 +1,4 @@
-// Ежедневный сбор данных для сайта: ставки центробанков, инфляция, безработица, даты заседаний.
+// Ежедневный сбор данных для сайта: ставки центробанков, инфляция, безработица, даты заседаний, календарь «Что ждать».
 //
 // Запуск у себя:   npm run update-data      (ключ FRED берётся из файла .env)
 // Запуск в GitHub: .github/workflows/update-data.yml, раз в день по расписанию
@@ -42,10 +42,14 @@ async function get(url, as = "json") {
 
 // ---------- Источники ----------
 
-async function fred(series, params) {
+async function fredApi(path, params) {
   const key = process.env.FRED_API_KEY;
   if (!key) throw new Error("не задан FRED_API_KEY (см. README)");
-  const d = await get(`https://api.stlouisfed.org/fred/series/observations?series_id=${series}&api_key=${key}&file_type=json${params}`);
+  return get(`https://api.stlouisfed.org/fred/${path}?api_key=${key}&file_type=json${params}`);
+}
+
+async function fred(series, params) {
+  const d = await fredApi("series/observations", `&series_id=${series}${params}`);
   return d.observations.filter((o) => o.value !== ".").map((o) => ({ date: o.date, value: Number(o.value) }));
 }
 
@@ -82,6 +86,36 @@ async function gusCpi(year, month) {
 }
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+// ---------- Календарь «Что ждать» ----------
+
+// Собираем на 2 недели вперёд, сайт показывает ближайшие 7 дней.
+// Запас нужен, чтобы календарь не опустел, если сборщик несколько дней подряд не сработает.
+const EVENT_DAYS = 14;
+const addDays = (iso, n) => new Date(Date.parse(iso) + n * 86_400_000).toISOString().slice(0, 10);
+
+// Какие публикации США показывать: номер выпуска в FRED → название и подсказка.
+const US_RELEASES = {
+  10: { title: "Инфляция в США (CPI)", hint: "Насколько подорожали товары и услуги. От этого зависят решения ФРС." },
+  50: { title: "Рынок труда США", hint: "Безработица и сколько новых рабочих мест появилось за месяц." },
+  53: { title: "ВВП США", hint: "Насколько выросла или сжалась экономика США за квартал." },
+  54: { title: "Расходы американцев и инфляция PCE", hint: "Сколько тратят люди и как растут цены. Эту инфляцию ФРС смотрит в первую очередь." },
+  9: { title: "Розничные продажи в США", hint: "Сколько люди потратили в магазинах за месяц." },
+};
+
+// Какие публикации еврозоны показывать: название в календаре Eurostat → название и подсказка.
+const EU_RELEASES = {
+  "Flash estimate inflation euro area": { title: "Инфляция в еврозоне — первая оценка", hint: "Насколько подорожали товары и услуги. От этого зависят решения ЕЦБ." },
+  "Inflation (HICP)": { title: "Инфляция в еврозоне — итоговые данные", hint: "Уточнение первой оценки, обычно почти без изменений." },
+  "Preliminary flash estimate GDP - EU and euro area": { title: "ВВП еврозоны — первая оценка", hint: "Насколько выросла или сжалась экономика еврозоны за квартал." },
+  Unemployment: { title: "Безработица в еврозоне", hint: "Доля людей, которые ищут работу и пока не нашли." },
+};
+
+// Отчёты: компании из нашего списка и все, кто дороже $200 млрд.
+const BIG_COMPANY_CAP = 200e9;
+const EARNINGS_TIME = { "time-pre-market": "до открытия биржи в США", "time-after-hours": "после закрытия биржи в США" };
+// «Palo Alto Networks, Inc.» → «Palo Alto Networks», «Alibaba Group Holding Limited» → «Alibaba»
+const shortName = (name) => name.replace(/,?\s+(Group|Holdings?|Inc|Incorporated|Corp|Corporation|Company|Ltd|Limited|plc|N\.V|S\.A|SE|AG)\b.*$/i, "");
 
 const tasks = {
   async fedRate() {
@@ -209,6 +243,43 @@ const tasks = {
   async nbpMeetings() {
     const { decisionDays, source } = CONFIG.nbpMeetings;
     return upcoming(decisionDays, source);
+  },
+
+  async usReleases() {
+    const d = await fredApi(
+      "releases/dates",
+      `&realtime_start=${today}&realtime_end=${addDays(today, EVENT_DAYS)}&include_release_dates_with_no_data=true&limit=1000`,
+    );
+    const events = d.release_dates.filter((r) => US_RELEASES[r.release_id]).map((r) => ({ date: r.date, ...US_RELEASES[r.release_id] }));
+    return { events, source: "FRED", url: "https://fred.stlouisfed.org/releases/calendar" };
+  },
+
+  // Тот же запрос, что делает страница календаря Eurostat; время в ответе — по Люксембургу.
+  async euReleases() {
+    const range = (iso) => encodeURIComponent(`${iso}T00:00:00+01:00`);
+    const list = await get(
+      "https://ec.europa.eu/eurostat/o/calendars/eventsJson?theme=0&category=0&keywords=&isEuroindicator=true&authorInclude=&authorExclude=" +
+        `&start=${range(today)}&end=${range(addDays(today, EVENT_DAYS + 1))}&timeZone=Europe%2FLuxembourg`,
+    );
+    const events = list.filter((e) => EU_RELEASES[e.title]).map((e) => ({ date: e.start.slice(0, 10), ...EU_RELEASES[e.title] }));
+    return { events, source: "Eurostat", url: "https://ec.europa.eu/eurostat/web/main/news/release-calendar" };
+  },
+
+  // Календарь Nasdaq знает только компании с американских бирж, поэтому польских отчётов здесь нет.
+  async earnings() {
+    const ours = new Map(CONFIG.companies.map((c) => [c.symbol, c.name]));
+    const events = [];
+    for (let i = 0; i <= EVENT_DAYS; i++) {
+      const date = addDays(today, i);
+      const d = await get(`https://api.nasdaq.com/api/calendar/earnings?date=${date}`);
+      if (d.status?.rCode !== 200) throw new Error(`Nasdaq ответил кодом ${d.status?.rCode} за ${date}`);
+      for (const r of d.data?.rows || []) {
+        const cap = Number(r.marketCap.replace(/[$,]/g, ""));
+        if (!ours.has(r.symbol) && !(cap >= BIG_COMPANY_CAP)) continue;
+        events.push({ date, name: ours.get(r.symbol) || shortName(r.name), when: EARNINGS_TIME[r.time] ?? null });
+      }
+    }
+    return { events, source: "Nasdaq", url: "https://www.nasdaq.com/market-activity/earnings" };
   },
 };
 
