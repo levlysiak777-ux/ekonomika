@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T00:24:43.044Z",
+  "generatedAt": "2026-11-18T00:43:06.832Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-18T00:24:37.210Z"
+      "checkedAt": "2026-11-18T00:43:00.606Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-18T00:24:37.334Z"
+      "checkedAt": "2026-11-18T00:43:00.745Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-18T00:24:37.364Z"
+      "checkedAt": "2026-11-18T00:43:00.754Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": true,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-18T00:24:37.390Z"
+      "checkedAt": "2026-11-18T00:43:00.770Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-18T00:24:37.437Z"
+      "checkedAt": "2026-11-18T00:43:00.824Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-18T00:24:37.985Z"
+      "checkedAt": "2026-11-18T00:43:03.012Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,33 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-18T00:24:43.043Z"
+      "checkedAt": "2026-11-18T00:43:06.831Z"
+    },
+    "usUnemployment": {
+      "period": "2026-10",
+      "value": 4.1,
+      "prev": 4.2,
+      "source": "FRED (BLS)",
+      "url": "https://fred.stlouisfed.org/series/UNRATE",
+      "checkedAt": "2026-11-18T00:43:00.994Z"
+    },
+    "fedRate": {
+      "value": 4,
+      "low": 3.75,
+      "since": "2026-09-17",
+      "prev": 3.75,
+      "prevLow": 3.5,
+      "source": "FRED",
+      "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+      "checkedAt": "2026-11-18T00:43:00.989Z"
+    },
+    "usInflation": {
+      "period": "2026-09",
+      "value": 3.7,
+      "prev": 3.4,
+      "source": "FRED (BLS)",
+      "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
+      "checkedAt": "2026-11-18T00:43:00.956Z"
     }
   }
 }

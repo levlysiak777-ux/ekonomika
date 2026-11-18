@@ -18,6 +18,17 @@ const startYear = (yearsBack) => `${new Date().getUTCFullYear() - yearsBack}-01-
 const round1 = (v) => Math.round(v * 10) / 10;
 const pad = (n) => String(n).padStart(2, "0");
 
+// «2026-10» → «2026-09»
+const prevMonth = (period) => {
+  const [y, m] = period.split("-").map(Number);
+  return m === 1 ? `${y - 1}-12` : `${y}-${pad(m - 1)}`;
+};
+// Значение «месяцем ранее» — только если это действительно соседний месяц, а не более старый.
+const prevIfAdjacent = (last, prev) => (prev && prev.period === prevMonth(last.period) ? prev.value : null);
+// Последние месячные значения FRED (пустые месяцы пропущены), от новых к старым.
+const fredMonthly = async (series, units) =>
+  (await fred(series, `&units=${units}&sort_order=desc&limit=6`)).map((o) => ({ period: o.date.slice(0, 7), value: round1(o.value) }));
+
 async function get(url, as = "json") {
   const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(60_000) });
   if (!res.ok) {
@@ -111,9 +122,12 @@ const tasks = {
     return { value: Number(value.replace(",", ".")), since: ref.match(/obowiazuje_od="([\d-]+)"/)?.[1] ?? null, prev: null, source: "NBP", url };
   },
 
+  // Месяц может быть пустым: за октябрь 2025 BLS цены не собирал (остановка работы правительства США),
+  // поэтому годового изменения за октябрь 2026 нет. Тогда берём последний месяц, за который оно есть.
   async usInflation() {
-    const [last, prev] = await fred("CPIAUCNS", "&units=pc1&sort_order=desc&limit=2");
-    return { value: round1(last.value), period: last.date.slice(0, 7), prev: round1(prev.value), source: "FRED (BLS)", url: "https://fred.stlouisfed.org/series/CPIAUCNS" };
+    const [last, prev] = await fredMonthly("CPIAUCNS", "pc1");
+    if (!last) throw new Error("FRED не вернул значений CPI");
+    return { ...last, prev: prevIfAdjacent(last, prev), source: "FRED (BLS)", url: "https://fred.stlouisfed.org/series/CPIAUCNS" };
   },
 
   async euInflation() {
@@ -129,7 +143,7 @@ const tasks = {
     return {
       value: last.value,
       period: last.period,
-      prev: points.at(-2)?.value ?? null,
+      prev: prevIfAdjacent(last, points.at(-2)),
       preliminary: last.status === "e", // «e» у Eurostat — предварительная оценка
       source: "Eurostat",
       url: "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
@@ -148,15 +162,16 @@ const tasks = {
     return {
       value: found[0].value,
       period: found[0].period,
-      prev: found[1]?.value ?? null,
+      prev: prevIfAdjacent(found[0], found[1]),
       source: "GUS",
       url: "https://api-dbw.stat.gov.pl/",
     };
   },
 
   async usUnemployment() {
-    const [last, prev] = await fred("UNRATE", "&sort_order=desc&limit=2");
-    return { value: last.value, period: last.date.slice(0, 7), prev: prev.value, source: "FRED (BLS)", url: "https://fred.stlouisfed.org/series/UNRATE" };
+    const [last, prev] = await fredMonthly("UNRATE", "lin");
+    if (!last) throw new Error("FRED не вернул значений безработицы");
+    return { ...last, prev: prevIfAdjacent(last, prev), source: "FRED (BLS)", url: "https://fred.stlouisfed.org/series/UNRATE" };
   },
 
   // Дни решений ФРС: последний день каждого заседания из официального календаря.
