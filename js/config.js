@@ -33,4 +33,22 @@ export const CONFIG = {
     { group: "Криптовалюты", name: "Биткоин", hint: "Самая крупная криптовалюта", symbol: "BTC-USD", kind: "crypto" },
     { group: "Криптовалюты", name: "Эфир", hint: "Вторая по размеру криптовалюта", symbol: "ETH-USD", kind: "crypto" },
   ],
+
+  // Крупные компании. Поля те же, kind всегда "stock".
+  // Из этого списка считаются «Топ-5 растут» и «Топ-5 падают».
+  companies: [
+    { group: "Мировые гиганты", name: "Nvidia", hint: "Чипы для искусственного интеллекта и видеокарты", symbol: "NVDA", kind: "stock" },
+    { group: "Мировые гиганты", name: "Apple", hint: "iPhone, Mac и сервисы", symbol: "AAPL", kind: "stock" },
+    { group: "Мировые гиганты", name: "Microsoft", hint: "Windows, Office и облако Azure", symbol: "MSFT", kind: "stock" },
+    { group: "Мировые гиганты", name: "Alphabet", hint: "Google, YouTube и Android", symbol: "GOOGL", kind: "stock" },
+    { group: "Мировые гиганты", name: "Amazon", hint: "Интернет-магазин и облако AWS", symbol: "AMZN", kind: "stock" },
+    { group: "Мировые гиганты", name: "Meta", hint: "Facebook, Instagram и WhatsApp", symbol: "META", kind: "stock" },
+    { group: "Мировые гиганты", name: "Tesla", hint: "Электромобили и аккумуляторы", symbol: "TSLA", kind: "stock" },
+    { group: "Мировые гиганты", name: "Broadcom", hint: "Чипы для сетей и дата-центров", symbol: "AVGO", kind: "stock" },
+    { group: "Мировые гиганты", name: "TSMC", hint: "Производит чипы для Apple и Nvidia (Тайвань, акции в США)", symbol: "TSM", kind: "stock" },
+
+    { group: "Польша", name: "Orlen", hint: "Крупнейшая нефтяная компания Польши", symbol: "PKN.WA", kind: "stock" },
+    { group: "Польша", name: "PKO BP", hint: "Крупнейший банк Польши", symbol: "PKO.WA", kind: "stock" },
+    { group: "Польша", name: "CD Projekt", hint: "Создатель игр «Ведьмак» и Cyberpunk 2077", symbol: "CDR.WA", kind: "stock" },
+  ],
 };

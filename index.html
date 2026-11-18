@@ -23,10 +23,13 @@
       </button>
     </header>
 
-    <div class="updated" id="updated" role="status">
-      <span class="dot" aria-hidden="true"></span>
-      <span id="updated-text">Загружаю цены…</span>
-      <span class="next" id="next"></span>
+    <div class="updated" id="updated">
+      <div class="updated-line">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="updated-text" role="status">Загружаю цены…</span>
+        <span class="next" id="next"></span>
+      </div>
+      <p class="delay">Данные с задержкой до ~15 минут (бесплатный источник). Варшавская биржа — всегда на 15 минут.</p>
     </div>
 
     <main>
@@ -37,22 +40,33 @@
             <span class="up">зелёный</span> — выросла, <span class="down">красный</span> — упала.</p>
         </div>
         <table class="quotes">
-          <thead>
-            <tr>
-              <th scope="col" class="c-name">Актив</th>
-              <th scope="col">Цена</th>
-              <th scope="col">1 час <button type="button" class="tip" aria-label="Подсказка" data-tip="Как изменилась цена за последние 60 минут.">?</button></th>
-              <th scope="col">День <button type="button" class="tip" aria-label="Подсказка" data-tip="По сравнению с ценой закрытия прошлого торгового дня. У криптовалют — за последние 24 часа.">?</button></th>
-              <th scope="col">Неделя <button type="button" class="tip" aria-label="Подсказка" data-tip="По сравнению с ценой 7 дней назад.">?</button></th>
-              <th scope="col">Месяц <button type="button" class="tip" aria-label="Подсказка" data-tip="По сравнению с ценой месяц назад.">?</button></th>
-              <th scope="col">Год <button type="button" class="tip" aria-label="Подсказка" data-tip="По сравнению с ценой год назад.">?</button></th>
-              <th scope="col" class="c-spark">За месяц <button type="button" class="tip" aria-label="Подсказка" data-tip="Как менялась цена последний месяц. Наведите или коснитесь графика, чтобы увидеть цену на конкретную дату.">?</button></th>
-            </tr>
-          </thead>
+          <thead id="markets-head"></thead>
           <tbody id="markets-body"></tbody>
         </table>
-        <p class="delay">Цены из бесплатных источников и могут отставать до ~15 минут.
-          Варшавская биржа (WIG20) всегда показывается с задержкой 15 минут.</p>
+      </section>
+
+      <section class="card" aria-labelledby="companies-title">
+        <div class="card-head">
+          <h2 id="companies-title">Крупные компании
+            <button type="button" class="tip" aria-label="Подсказка" data-tip="Цена акции — сколько стоит маленькая доля компании на бирже. Растёт, когда инвесторы ждут от компании большего.">?</button></h2>
+          <p class="sub">Акции самых дорогих компаний мира и крупнейших компаний Польши.</p>
+        </div>
+        <div class="movers">
+          <div class="mover-box">
+            <h3>Топ-5 растут за день
+              <button type="button" class="tip" aria-label="Подсказка" data-tip="Компании из таблицы ниже, которые сильнее всего выросли за день. Если биржа закрыта — за последний торговый день.">?</button></h3>
+            <ol id="movers-up"></ol>
+          </div>
+          <div class="mover-box">
+            <h3>Топ-5 падают за день
+              <button type="button" class="tip" aria-label="Подсказка" data-tip="Компании из таблицы ниже, которые сильнее всего упали за день. Если биржа закрыта — за последний торговый день.">?</button></h3>
+            <ol id="movers-down"></ol>
+          </div>
+        </div>
+        <table class="quotes">
+          <thead id="companies-head"></thead>
+          <tbody id="companies-body"></tbody>
+        </table>
       </section>
     </main>
 

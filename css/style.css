@@ -93,15 +93,14 @@ h1 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
 
 /* ---------- Строка «Обновлено» ---------- */
 .updated {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
   margin: 16px 0 20px; padding: 10px 14px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  font-weight: 500;
 }
+.updated-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 500; }
 .updated .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
 .updated.ok .dot { background: var(--up); }
 .updated.error .dot { background: var(--down); }
-.updated.error { color: var(--down); }
+.updated.error .updated-line { color: var(--down); }
 .updated .next { color: var(--muted); font-weight: 400; }
 
 /* ---------- Карточки-блоки ---------- */
@@ -112,7 +111,7 @@ h1 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
 .card-head { margin-bottom: 12px; }
 h2 { font-size: 20px; line-height: 1.25; }
 .sub { color: var(--text-2); margin-top: 4px; }
-.delay { color: var(--muted); font-size: 13px; margin-top: 14px; }
+.delay { color: var(--muted); font-size: 13px; margin-top: 2px; }
 
 /* ---------- Таблица котировок ---------- */
 .quotes { width: 100%; border-collapse: collapse; }
@@ -167,6 +166,24 @@ h2 { font-size: 20px; line-height: 1.25; }
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
+/* «Топ-5 растут / падают» */
+.movers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+.mover-box { background: var(--surface-2); border-radius: 12px; padding: 12px 14px; }
+h3 { margin: 0 0 6px; font-size: 15px; }
+.movers ol { margin: 0; padding: 0; list-style: none; counter-reset: pos; }
+.movers li {
+  display: grid; grid-template-columns: 20px minmax(0, 1fr) auto 84px; align-items: baseline; gap: 8px;
+  padding: 6px 0; border-top: 1px solid var(--grid); counter-increment: pos;
+  font-variant-numeric: tabular-nums;
+}
+.movers li:first-child { border-top: 0; }
+.movers li::before { content: counter(pos); color: var(--muted); font-size: 13px; }
+.movers li.empty { display: block; color: var(--muted); font-size: 13px; }
+.movers li.empty::before { content: none; }
+.m-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-price { color: var(--text-2); }
+.movers .chg { text-align: right; font-weight: 600; }
+
 /* ---------- Подвал ---------- */
 .foot { color: var(--text-2); font-size: 13px; text-align: center; padding-top: 8px; }
 .foot p + p { margin-top: 4px; }
@@ -197,4 +214,5 @@ h2 { font-size: 20px; line-height: 1.25; }
     color: var(--muted); font-size: 11px; font-weight: 400;
   }
   .quotes .nodata { grid-column: 1 / -1; grid-row: 3; }
+  .movers { grid-template-columns: 1fr; }
 }

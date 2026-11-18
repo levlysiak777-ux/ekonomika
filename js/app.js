@@ -6,15 +6,20 @@ const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const CLOSED_AFTER = 30 * MINUTE; // нет новых цен полчаса → торги не идут
+// Столбцы изменений: ключ, заголовок, короткая подпись на телефоне, подсказка.
 const PERIODS = [
-  ["h1", "1 ч"],
-  ["d1", "день"],
-  ["w1", "нед."],
-  ["m1", "мес."],
-  ["y1", "год"],
+  ["h1", "1 час", "1 ч", "Как изменилась цена за последние 60 минут."],
+  ["d1", "День", "день", "По сравнению с ценой закрытия прошлого торгового дня. У криптовалют — за последние 24 часа."],
+  ["w1", "Неделя", "нед.", "По сравнению с ценой 7 дней назад."],
+  ["m1", "Месяц", "мес.", "По сравнению с ценой месяц назад."],
+  ["y1", "Год", "год", "По сравнению с ценой год назад."],
 ];
 
-const assets = CONFIG.markets.map((a, i) => ({ ...a, id: `m${i}`, live: null, hist: null, liveAt: 0, histAt: 0, failed: false }));
+const toAsset = (section) => (a) => ({ ...a, section, live: null, hist: null, liveAt: 0, histAt: 0, failed: false });
+const assets = [...CONFIG.markets.map(toAsset("markets")), ...CONFIG.companies.map(toAsset("companies"))];
+assets.forEach((a, i) => (a.id = `a${i}`));
+const markets = assets.filter((a) => a.section === "markets");
+const companies = assets.filter((a) => a.section === "companies");
 const sparks = new Map(); // id мини-графика → точки и масштаб, для подсказки при наведении
 let lastRefresh = 0;
 let timer = null;
@@ -138,6 +143,17 @@ const fmtSigned = (v) => `${fmtPct.format(v).replace("-", "−")} %`;
 
 // ---------- Отрисовка ----------
 
+const tipButton = (text) => `<button type="button" class="tip" aria-label="Подсказка" data-tip="${esc(text)}">?</button>`;
+
+function headHtml(first) {
+  return `<tr>
+    <th scope="col" class="c-name">${first}</th>
+    <th scope="col">Цена</th>
+    ${PERIODS.map(([, title, , hint]) => `<th scope="col">${title} ${tipButton(hint)}</th>`).join("")}
+    <th scope="col" class="c-spark">За месяц ${tipButton("Как менялась цена последний месяц. Наведите или коснитесь графика, чтобы увидеть цену на конкретную дату.")}</th>
+  </tr>`;
+}
+
 function changeCell(v, key, label) {
   const value = v.ch[key];
   if (value == null) {
@@ -177,24 +193,50 @@ function rowHtml(a, now) {
   if (!v) return `<tr>${name}<td class="nodata" colspan="7">нет данных — источник не ответил</td></tr>`;
   return `<tr>${name}
     <td class="c-price">${fmtPrice(a, v.price, v.currency)}</td>
-    ${PERIODS.map(([key, label]) => changeCell(v, key, label)).join("")}
+    ${PERIODS.map(([key, , label]) => changeCell(v, key, label)).join("")}
     <td class="c-spark">${sparkSvg(a, v.spark, v.currency)}</td>
   </tr>`;
 }
 
-function render() {
-  const now = Date.now();
-  sparks.clear();
+function renderTable(id, list, now) {
   let group = null;
   const rows = [];
-  for (const a of assets) {
+  for (const a of list) {
     if (a.group !== group) {
       group = a.group;
       rows.push(`<tr class="group"><th colspan="8" scope="colgroup">${esc(group)}</th></tr>`);
     }
     rows.push(rowHtml(a, now));
   }
-  $("markets-body").innerHTML = rows.join("");
+  $(id).innerHTML = rows.join("");
+}
+
+// «Топ-5 растут / падают»: компании с самым большим изменением за день.
+function renderMovers(now) {
+  const withDay = companies.map((a) => ({ a, v: view(a, now) })).filter(({ v }) => v?.ch.d1 != null);
+  const item = ({ a, v }) => `<li>
+      <span class="m-name">${esc(a.name)}</span>
+      <span class="m-price">${fmtPrice(a, v.price, v.currency)}</span>
+      <span class="chg ${v.ch.d1 > 0 ? "up" : "down"}">${fmtSigned(v.ch.d1)}</span>
+    </li>`;
+  const fill = (id, list, emptyText) => {
+    $(id).innerHTML = !withDay.length
+      ? `<li class="empty">нет данных</li>`
+      : list.length
+        ? list.map(item).join("")
+        : `<li class="empty">${emptyText}</li>`;
+  };
+  const byDay = (x, y) => y.v.ch.d1 - x.v.ch.d1;
+  fill("movers-up", withDay.filter(({ v }) => v.ch.d1 >= 0.005).sort(byDay).slice(0, 5), "Ни одна компания из списка не выросла");
+  fill("movers-down", withDay.filter(({ v }) => v.ch.d1 <= -0.005).sort(byDay).reverse().slice(0, 5), "Ни одна компания из списка не упала");
+}
+
+function render() {
+  const now = Date.now();
+  sparks.clear();
+  renderTable("markets-body", markets, now);
+  renderTable("companies-body", companies, now);
+  renderMovers(now);
   renderStatus();
 }
 
@@ -298,6 +340,8 @@ $("theme-btn").addEventListener("click", () => {
 
 // ---------- Запуск ----------
 
+$("markets-head").innerHTML = headHtml("Актив");
+$("companies-head").innerHTML = headHtml("Компания");
 $("today").textContent = new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 phone.addEventListener("change", () => lastRefresh && render());
 document.addEventListener("visibilitychange", () => {
