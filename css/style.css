@@ -268,4 +268,8 @@ h3 { margin: 0 0 6px; font-size: 15px; }
   .quotes .nodata { grid-column: 1 / -1; grid-row: 3; }
   .movers { grid-template-columns: 1fr; }
   .duo { grid-template-columns: 1fr; gap: 0; }
+  /* точка слева, длинный текст переносится рядом с ней, а не уходит на новую строку */
+  .updated-line { display: grid; grid-template-columns: 8px 1fr; align-items: start; }
+  .updated .dot { margin-top: 7px; }
+  .updated .next { grid-column: 2; }
 }
