@@ -1,0 +1,307 @@
+import { CONFIG } from "./config.js";
+
+const PROXY = (CONFIG.quotesProxy || "/api").replace(/\/+$/, "");
+const REFRESH_MS = CONFIG.refreshSeconds * 1000;
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const CLOSED_AFTER = 30 * MINUTE; // нет новых цен полчаса → торги не идут
+const PERIODS = [
+  ["h1", "1 ч"],
+  ["d1", "день"],
+  ["w1", "нед."],
+  ["m1", "мес."],
+  ["y1", "год"],
+];
+
+const assets = CONFIG.markets.map((a, i) => ({ ...a, id: `m${i}`, live: null, hist: null, liveAt: 0, histAt: 0, failed: false }));
+const sparks = new Map(); // id мини-графика → точки и масштаб, для подсказки при наведении
+let lastRefresh = 0;
+let timer = null;
+let busy = false;
+
+const $ = (id) => document.getElementById(id);
+const phone = matchMedia("(max-width: 720px)");
+
+// ---------- Загрузка данных ----------
+
+async function getJSON(url, fresh) {
+  const res = await fetch(url, fresh ? { cache: "no-store" } : {});
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+const needsHistory = (a, now) => !a.hist || now - a.histAt > HOUR;
+
+async function load(a, now) {
+  const sym = encodeURIComponent(a.symbol);
+  const [live, hist] = await Promise.allSettled([
+    getJSON(`${PROXY}/chart?symbol=${sym}&range=2d`, true),
+    needsHistory(a, now) ? getJSON(`${PROXY}/chart?symbol=${sym}&range=1y`) : null,
+  ]);
+  if (live.status === "fulfilled") Object.assign(a, { live: live.value, liveAt: now, failed: false });
+  else a.failed = true;
+  if (hist.status === "fulfilled" && hist.value) Object.assign(a, { hist: hist.value, histAt: now });
+}
+
+// Обновляем только пока вкладка видна; при возвращении на вкладку — сразу.
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  clearTimeout(timer);
+  const now = Date.now();
+  await Promise.all(assets.map((a) => load(a, now)));
+  lastRefresh = Date.now();
+  busy = false;
+  render();
+  timer = setTimeout(() => document.hidden || refresh(), REFRESH_MS);
+}
+
+// ---------- Расчёт изменений ----------
+
+const pct = (price, base) => (price == null || !base ? null : (price / base - 1) * 100);
+const monthsAgo = (now, n) => {
+  const d = new Date(now);
+  d.setMonth(d.getMonth() - n);
+  return d.getTime();
+};
+const dayKey = (ms) => new Date(ms).toDateString();
+
+// Последняя цена в момент ts (секунды) или раньше.
+function priceAt(t, c, ts) {
+  let v = null;
+  for (let i = 0; i < t.length && t[i] <= ts; i++) if (c[i] != null) v = c[i];
+  return v;
+}
+
+// Цена закрытия на дату target (мс). Если история начинается чуть позже — берём первый день.
+function closeOn(hist, target) {
+  const v = priceAt(hist.t, hist.c, target / 1000);
+  if (v != null) return v;
+  const first = hist.c.findIndex((x) => x != null);
+  return first >= 0 && hist.t[first] * 1000 - target < 5 * DAY ? hist.c[first] : null;
+}
+
+function view(a, now) {
+  if (!a.live) return null;
+  const L = a.live;
+  const time = L.time * 1000;
+  const closed = now - time > CLOSED_AFTER;
+  // Криптовалюты торгуются круглосуточно: «день» для них — последние 24 часа.
+  const dayBase = a.kind === "crypto" ? priceAt(L.t, L.c, L.time - 86400) : L.prevClose;
+  const ch = {
+    h1: closed ? null : pct(L.price, priceAt(L.t, L.c, L.time - 3600) ?? L.prevClose),
+    d1: pct(L.price, dayBase),
+    w1: null,
+    m1: null,
+    y1: null,
+  };
+  let spark = [];
+  if (a.hist) {
+    const H = a.hist;
+    ch.w1 = pct(L.price, closeOn(H, now - 7 * DAY));
+    ch.m1 = pct(L.price, closeOn(H, monthsAgo(now, 1)));
+    ch.y1 = pct(L.price, closeOn(H, monthsAgo(now, 12)));
+    const from = monthsAgo(now, 1);
+    spark = H.t
+      .map((t, i) => [t * 1000, H.c[i]])
+      .filter(([t, v]) => v != null && t >= from && dayKey(t) !== dayKey(time));
+    spark.push([time, L.price]);
+  }
+  return { price: L.price, currency: L.currency, time, closed, ch, spark };
+}
+
+// ---------- Форматирование ----------
+
+const nf = (d) => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmtPct = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: "exceptZero" });
+const CURRENCY = { USD: "$", PLN: "zł", EUR: "€" };
+const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+
+function decimals(a, price) {
+  if (a.kind === "fx") return 4;
+  if (a.kind === "crypto" && price >= 1000) return 0;
+  return 2;
+}
+
+function fmtPrice(a, price, currency) {
+  const num = nf(decimals(a, price)).format(price);
+  return a.kind === "index" ? num : `${num} ${CURRENCY[currency] || currency || ""}`.trim();
+}
+
+function fmtStamp(ms) {
+  const sameDay = dayKey(ms) === dayKey(Date.now());
+  return new Date(ms).toLocaleString("ru-RU", sameDay ? { hour: "2-digit", minute: "2-digit" } : { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+const fmtSigned = (v) => `${fmtPct.format(v).replace("-", "−")} %`;
+
+// ---------- Отрисовка ----------
+
+function changeCell(v, key, label) {
+  const value = v.ch[key];
+  if (value == null) {
+    const why = key === "h1" && v.closed ? "Биржа закрыта — за последний час цена не менялась" : "нет данных";
+    return `<td class="chg na" data-label="${label}" title="${why}">—</td>`;
+  }
+  const cls = Math.abs(value) < 0.005 ? "flat" : value > 0 ? "up" : "down";
+  return `<td class="chg ${cls}" data-label="${label}">${fmtSigned(value)}</td>`;
+}
+
+function sparkSvg(a, points, currency) {
+  if (points.length < 2) return `<span class="chg na" title="нет данных">—</span>`;
+  const [W, H, P] = phone.matches ? [96, 32, 4] : [120, 36, 4];
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  const [x0, x1, y0, y1] = [xs[0], xs.at(-1), Math.min(...ys), Math.max(...ys)];
+  const X = (t) => P + ((W - 2 * P) * (t - x0)) / (x1 - x0 || 1);
+  const Y = (v) => H - P - ((H - 2 * P) * (v - y0)) / (y1 - y0 || 1);
+  const d = points.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+  const up = ys.at(-1) >= ys[0];
+  sparks.set(a.id, { a, points, currency, X, Y });
+  return `<svg class="spark ${up ? "up" : "down"}" data-id="${a.id}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+      role="img" aria-label="${esc(a.name)}: график за месяц, ${up ? "рост" : "падение"}">
+    <line class="cross" y1="0" y2="${H}"/>
+    <path d="${d}"/>
+    <circle class="end" cx="${X(xs.at(-1)).toFixed(1)}" cy="${Y(ys.at(-1)).toFixed(1)}" r="3"/>
+    <circle class="hover" r="3.5"/>
+  </svg>`;
+}
+
+function rowHtml(a, now) {
+  const v = view(a, now);
+  let note = "";
+  if (v && a.failed) note = `<span class="note warn">⚠ не обновилось · данные на ${fmtStamp(a.liveAt)}</span>`;
+  else if (v?.closed) note = `<span class="note">биржа закрыта · цена на ${fmtStamp(v.time)}</span>`;
+  const name = `<th scope="row" class="c-name"><span class="name">${esc(a.name)}</span><span class="hint">${esc(a.hint)}</span>${note}</th>`;
+  if (!v) return `<tr>${name}<td class="nodata" colspan="7">нет данных — источник не ответил</td></tr>`;
+  return `<tr>${name}
+    <td class="c-price">${fmtPrice(a, v.price, v.currency)}</td>
+    ${PERIODS.map(([key, label]) => changeCell(v, key, label)).join("")}
+    <td class="c-spark">${sparkSvg(a, v.spark, v.currency)}</td>
+  </tr>`;
+}
+
+function render() {
+  const now = Date.now();
+  sparks.clear();
+  let group = null;
+  const rows = [];
+  for (const a of assets) {
+    if (a.group !== group) {
+      group = a.group;
+      rows.push(`<tr class="group"><th colspan="8" scope="colgroup">${esc(group)}</th></tr>`);
+    }
+    rows.push(rowHtml(a, now));
+  }
+  $("markets-body").innerHTML = rows.join("");
+  renderStatus();
+}
+
+function renderStatus() {
+  const box = $("updated");
+  const ok = assets.filter((a) => !a.failed).length;
+  box.classList.toggle("ok", ok === assets.length);
+  box.classList.toggle("error", ok === 0);
+  const at = new Date(lastRefresh).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  $("updated-text").textContent =
+    ok === 0
+      ? `Не удалось получить цены (${at}). Проверьте интернет или адрес Worker в js/config.js.`
+      : ok < assets.length
+        ? `Цены обновлены: ${at}. Часть источников не ответила.`
+        : `Цены обновлены: ${at}`;
+}
+
+function tick() {
+  if (!lastRefresh) return;
+  const left = Math.max(0, Math.round((lastRefresh + REFRESH_MS - Date.now()) / 1000));
+  $("next").textContent = document.hidden ? "" : `· следующее через ${left} с`;
+}
+
+// ---------- Подсказки и наведение на график ----------
+
+const tooltip = $("tooltip");
+
+function showTooltip(html, x, y, kind) {
+  tooltip.innerHTML = html;
+  tooltip.dataset.kind = kind;
+  tooltip.hidden = false;
+  const r = tooltip.getBoundingClientRect();
+  const left = Math.min(Math.max(8, x - r.width / 2), innerWidth - r.width - 8);
+  const top = y - r.height - 12 < 8 ? y + 16 : y - r.height - 12;
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+}
+
+function hideTooltip() {
+  tooltip.hidden = true;
+  document.querySelectorAll(".spark.active").forEach((s) => s.classList.remove("active"));
+}
+
+function onSparkMove(e) {
+  const svg = e.target.closest?.(".spark");
+  const s = svg && sparks.get(svg.dataset.id);
+  if (!s) return;
+  // График рисуется в натуральную величину, поэтому координаты SVG = пиксели.
+  const rect = svg.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  let best = s.points[0];
+  for (const p of s.points) if (Math.abs(s.X(p[0]) - x) < Math.abs(s.X(best[0]) - x)) best = p;
+  const [cx, cy] = [s.X(best[0]), s.Y(best[1])];
+  svg.querySelector(".cross").setAttribute("x1", cx);
+  svg.querySelector(".cross").setAttribute("x2", cx);
+  svg.querySelector(".hover").setAttribute("cx", cx);
+  svg.querySelector(".hover").setAttribute("cy", cy);
+  svg.classList.add("active");
+  const date = new Date(best[0]).toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+  showTooltip(`${date}<br><strong>${fmtPrice(s.a, best[1], s.currency)}</strong>`, rect.left + cx, rect.top + cy, "spark");
+}
+
+document.addEventListener("pointermove", (e) => {
+  if (e.target.closest?.(".spark")) onSparkMove(e);
+  else if (!e.target.closest?.(".tip")) hideTooltip();
+});
+document.addEventListener("pointerdown", (e) => {
+  if (e.target.closest?.(".spark")) onSparkMove(e);
+});
+document.addEventListener("mouseover", (e) => {
+  const tip = e.target.closest?.(".tip");
+  if (tip) showTipFor(tip);
+});
+document.addEventListener("focusin", (e) => {
+  if (e.target.matches?.(".tip")) showTipFor(e.target);
+});
+document.addEventListener("focusout", () => tooltip.dataset.kind === "tip" && hideTooltip());
+document.addEventListener("click", (e) => {
+  const tip = e.target.closest?.(".tip");
+  if (tip) showTipFor(tip);
+  else if (!e.target.closest?.(".spark")) hideTooltip();
+});
+document.addEventListener("keydown", (e) => e.key === "Escape" && hideTooltip());
+addEventListener("scroll", hideTooltip, { passive: true });
+
+function showTipFor(el) {
+  const r = el.getBoundingClientRect();
+  showTooltip(esc(el.dataset.tip), r.left + r.width / 2, r.top, "tip");
+}
+
+// ---------- Тема ----------
+
+$("theme-btn").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try {
+    localStorage.setItem("theme", root.dataset.theme);
+  } catch {}
+});
+
+// ---------- Запуск ----------
+
+$("today").textContent = new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+phone.addEventListener("change", () => lastRefresh && render());
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && Date.now() - lastRefresh >= REFRESH_MS) refresh();
+});
+setInterval(tick, 1000);
+refresh();
