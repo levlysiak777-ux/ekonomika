@@ -133,7 +133,7 @@ function decimals(a, price) {
 
 function fmtPrice(a, price, currency) {
   const num = nf(decimals(a, price)).format(price);
-  return a.kind === "index" ? num : `${num}${NBSP}${CURRENCY[currency] || currency || ""}`.trim();
+  return a.kind === "index" ? num : `${num}${NBSP}${esc(CURRENCY[currency] || currency || "")}`.trim();
 }
 
 function fmtStamp(ms) {

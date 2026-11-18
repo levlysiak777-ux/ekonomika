@@ -7,6 +7,9 @@
 // Ответ:   { symbol, currency, price, time, prevClose, t: [секунды], c: [цены] }
 //          prevClose — цена закрытия прошлого торгового дня.
 //
+// Проверка: /health → { ok: true }, если Yahoo отвечает, иначе код 502.
+//           Её раз в час вызывает .github/workflows/health.yml.
+//
 // Этот же файл используется локально в server.js.
 
 const INTERVALS = { "2d": "5m", "1y": "1d" };
@@ -19,6 +22,10 @@ export default {
     const symbol = url.searchParams.get("symbol") || "";
     const range = url.searchParams.get("range") || "";
 
+    if (url.pathname === "/health") {
+      const ok = Boolean((await yahoo("^GSPC", "2d", INTERVALS["2d"]))?.meta?.regularMarketPrice);
+      return json({ ok }, ok ? 200 : 502);
+    }
     if (url.pathname !== "/chart" || !INTERVALS[range] || !/^[\w^.=-]{1,20}$/.test(symbol)) {
       return json({ error: "bad request" }, 400);
     }

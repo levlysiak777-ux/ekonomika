@@ -4,7 +4,7 @@
 
 import http from "node:http";
 import { readFile } from "node:fs/promises";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import worker from "./worker/worker.js";
 
@@ -36,7 +36,9 @@ http
 
     const path = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
     const file = normalize(join(ROOT, path));
-    if (!file.startsWith(ROOT) || path.split("/").some((part) => part.startsWith("."))) {
+    // Не отдаём ничего за пределами папки и скрытые файлы (.env, .git).
+    // Части пути проверяем уже после normalize: в Windows разделителем бывает и «\».
+    if (!file.startsWith(ROOT) || relative(ROOT, file).split(/[\\/]/).some((part) => part.startsWith("."))) {
       res.writeHead(403).end();
       return;
     }
@@ -48,4 +50,4 @@ http
       res.writeHead(404).end("Not found");
     }
   })
-  .listen(PORT, () => console.log(`Сайт запущен: http://localhost:${PORT}`));
+  .listen(PORT, "127.0.0.1", () => console.log(`Сайт запущен: http://localhost:${PORT}`)); // только с этого компьютера

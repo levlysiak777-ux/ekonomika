@@ -1,0 +1,51 @@
+# Раз в час проверяет, что всё работает, и пишет в Telegram, если нет:
+#   - посредник цен (Cloudflare Worker) отвечает и Yahoo отдаёт цены — /health;
+#   - сайт на GitHub Pages открывается;
+#   - данные на сайте свежие (сбор был не больше 36 часов назад).
+# Без настроенного Telegram GitHub всё равно пришлёт письмо о неудачной проверке.
+
+name: Проверить сайт
+
+on:
+  schedule:
+    - cron: "17 * * * *" # каждый час в :17
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Посредник цен
+        run: |
+          proxy=$(node --input-type=module -e 'const { CONFIG } = await import("./js/config.js"); console.log(CONFIG.quotesProxy)')
+          if [ -z "$proxy" ]; then echo "В js/config.js не задан quotesProxy (см. README)"; exit 1; fi
+          curl -fsS --max-time 30 "$proxy/health"
+
+      - name: Сайт и свежесть данных
+        run: |
+          site="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}"
+          curl -fsS --max-time 30 -o /dev/null "$site/"
+          curl -fsS --max-time 30 "$site/data/data.json" -o data.json
+          node -e '
+            const age = (Date.now() - Date.parse(require("./data.json").generatedAt)) / 3600e3;
+            console.log(`Данные собраны ${age.toFixed(1)} ч назад`);
+            if (!(age < 36)) process.exit(1);
+          '
+
+      - name: Сообщить в Telegram
+        if: failure()
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TEXT: "⚠ Экономика сегодня: проверка не прошла (посредник цен, сайт или свежесть данных)."
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$CHAT" ]; then echo "Telegram не настроен (см. README)"; exit 0; fi
+          curl -fsS -o /dev/null "https://api.telegram.org/bot$TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$CHAT" \
+            --data-urlencode "text=$TEXT $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

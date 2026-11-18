@@ -18,6 +18,73 @@ node server.js
 
 Цены обновляются раз в минуту, пока вкладка открыта.
 
+## Опубликовать в интернете
+
+Сайт живёт на GitHub Pages, посредник цен — на Cloudflare Workers. Оба бесплатные, карта не нужна.
+Займёт примерно полчаса. Ключи и токены вводятся только в настройках GitHub — в коде их нет.
+
+### 1. GitHub: репозиторий и сайт
+
+1. Зарегистрируйтесь на [github.com](https://github.com), если ещё нет аккаунта.
+2. Справа вверху «+» → New repository. Имя, например, `ekonomika`, видимость **Public**
+   (бесплатный GitHub Pages работает только для публичных репозиториев).
+   Ничего не добавляйте (без README и .gitignore) → Create repository.
+3. Отправьте код из папки проекта — подставьте своё имя на GitHub:
+
+   ```powershell
+   git remote add origin https://github.com/ВАШЕ-ИМЯ/ekonomika.git
+   ```
+
+   ```powershell
+   git push -u origin main
+   ```
+
+   При первом push откроется окно входа в GitHub.
+4. В репозитории: Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+5. Settings → Secrets and variables → Actions → New repository secret:
+   имя `FRED_API_KEY`, значение — ваш ключ FRED (как получить — ниже, в разделе про ежедневный сбор).
+6. Вкладка Actions → «Обновить данные» → Run workflow. Через пару минут сайт откроется по адресу
+   `https://ВАШЕ-ИМЯ.github.io/ekonomika/`. Цен пока не будет — для них нужен шаг 2.
+
+### 2. Cloudflare: посредник цен
+
+1. Зарегистрируйтесь на [dash.cloudflare.com](https://dash.cloudflare.com/sign-up).
+2. Слева Workers & Pages (Compute) → Create → Worker → шаблон «Hello World».
+   Имя, например, `ekonomika-quotes` → Deploy.
+3. Edit code → удалите всё, вставьте содержимое файла `worker/worker.js` → Deploy.
+4. Скопируйте адрес Worker — вида `https://ekonomika-quotes.ВАШ-ПОДДОМЕН.workers.dev`.
+   Откройте `адрес/health` — должно быть `{"ok":true}`.
+5. Впишите адрес в [js/config.js](js/config.js), в строку `quotesProxy` (без `/` в конце), и отправьте изменение:
+
+   ```powershell
+   git commit -am "Адрес посредника цен"
+   ```
+
+   ```powershell
+   git push
+   ```
+
+   Сайт опубликуется заново сам, через минуту-две цены появятся.
+
+Бесплатно Worker выдерживает 100 000 запросов в день. Одна открытая вкладка тратит около 1 400 в час,
+так что для личного пользования хватает с запасом.
+Если поменяете `worker/worker.js`, вставьте его в Cloudflare заново (шаг 3).
+
+### 3. Алерты в Telegram (по желанию)
+
+Раз в час GitHub проверяет: отвечает ли посредник и Yahoo, открывается ли сайт, свежие ли данные
+(`.github/workflows/health.yml`). Если что-то не так или не удался ежедневный сбор, GitHub пришлёт письмо,
+а если настроить Telegram — ещё и сообщение туда.
+
+1. В Telegram напишите [@BotFather](https://t.me/BotFather) → `/newbot` → придумайте имя.
+   Он пришлёт токен бота — строку вида `123456:ABC...`.
+2. Напишите своему новому боту любое сообщение.
+3. Откройте в браузере `https://api.telegram.org/botТОКЕН/getUpdates` (вместо ТОКЕН — токен из шага 1)
+   и найдите `"chat":{"id":` — это число и есть ваш chat id.
+4. В репозитории Settings → Secrets and variables → Actions добавьте два секрета:
+   `TELEGRAM_BOT_TOKEN` (токен) и `TELEGRAM_CHAT_ID` (число).
+5. Actions → «Проверить сайт» → Run workflow — проверка должна пройти зелёной.
+
 ## Ставки, календарь и новости: ежедневный сбор
 
 Ставки, инфляцию, безработицу, даты заседаний, календарь событий «Что ждать» и новости собирает скрипт `scripts/update-data.mjs`
@@ -85,7 +152,9 @@ npm run update-data
 | `server.js` | локальный запуск: отдаёт сайт и работает как посредник |
 | `scripts/update-data.mjs` | ежедневный сбор ставок, инфляции, календаря и новостей |
 | `data/data.json` | результат ежедневного сбора, его читает сайт |
-| `.github/workflows/update-data.yml` | расписание запуска сбора в GitHub Actions |
+| `.github/workflows/update-data.yml` | раз в день запускает сбор данных |
+| `.github/workflows/pages.yml` | публикует сайт на GitHub Pages после каждого изменения и каждого сбора |
+| `.github/workflows/health.yml` | раз в час проверяет посредника, сайт и свежесть данных, шлёт алерты |
 
 Почему нужен посредник: Yahoo Finance не разрешает браузеру брать данные напрямую.
 Поэтому сайт спрашивает посредника, а посредник — Yahoo.
