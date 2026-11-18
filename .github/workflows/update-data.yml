@@ -1,0 +1,48 @@
+# Раз в день собирает ставки, инфляцию и даты заседаний в data/data.json и сохраняет в репозиторий.
+# Запустить вручную: вкладка Actions → «Обновить данные» → Run workflow.
+# Если какой-то источник не ответил, запуск помечается ошибкой и GitHub присылает письмо,
+# но всё, что удалось собрать, всё равно сохраняется.
+
+name: Обновить данные
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # каждый день в 05:00 UTC (06:00 зимой / 07:00 летом по Варшаве); GitHub может запустить с опозданием
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Собрать данные
+        run: node scripts/update-data.mjs
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+
+      - name: Сохранить data.json
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/data.json
+          if git diff --cached --quiet; then
+            echo "Нечего сохранять"
+          else
+            git commit -m "Обновить данные $(date -u +%Y-%m-%d)"
+            git pull --rebase
+            git push
+          fi

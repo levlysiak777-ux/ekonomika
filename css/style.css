@@ -97,10 +97,11 @@ h1 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
   background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
 }
 .updated-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 500; }
+.updated-line + .updated-line { margin-top: 2px; }
 .updated .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-.updated.ok .dot { background: var(--up); }
-.updated.error .dot { background: var(--down); }
-.updated.error .updated-line { color: var(--down); }
+.updated-line.ok .dot { background: var(--up); }
+.updated-line.error .dot { background: var(--down); }
+.updated-line.error { color: var(--down); }
 .updated .next { color: var(--muted); font-weight: 400; }
 
 /* ---------- Карточки-блоки ---------- */
@@ -183,6 +184,26 @@ h3 { margin: 0 0 6px; font-size: 15px; }
 .m-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m-price { color: var(--text-2); }
 .movers .chg { text-align: right; font-weight: 600; }
+
+/* Плитки «Ставки и инфляция» */
+.block-title {
+  margin: 18px 0 8px; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+.card-head + .block-title { margin-top: 4px; }
+.tiles { display: grid; gap: 12px; }
+.tiles.rates { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.tiles.macro { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.tile { display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 12px; background: var(--surface-2); }
+.tile p { margin: 0; }
+.tile-label { margin: 0; font-size: 14px; font-weight: 600; }
+.tile-region { color: var(--text-2); font-weight: 400; }
+.tile-value { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+.tile-value.na { font-size: 16px; font-weight: 400; color: var(--muted); }
+.tile-meta, .tile-next { color: var(--text-2); font-size: 13px; }
+.tile-next strong { color: var(--text); }
+.tile-src { margin-top: auto; padding-top: 6px; font-size: 12px; color: var(--muted); }
+.tile .note { margin: 0; }
 
 /* ---------- Подвал ---------- */
 .foot { color: var(--text-2); font-size: 13px; text-align: center; padding-top: 8px; }

@@ -121,6 +121,7 @@ function view(a, now) {
 const nf = (d) => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d });
 const fmtPct = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: "exceptZero" });
 const CURRENCY = { USD: "$", PLN: "zł", EUR: "€" };
+const NBSP = "\u00a0"; // неразрывный пробел: «3,5 %» не разъезжается на две строки
 const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
 
 function decimals(a, price) {
@@ -131,7 +132,7 @@ function decimals(a, price) {
 
 function fmtPrice(a, price, currency) {
   const num = nf(decimals(a, price)).format(price);
-  return a.kind === "index" ? num : `${num} ${CURRENCY[currency] || currency || ""}`.trim();
+  return a.kind === "index" ? num : `${num}${NBSP}${CURRENCY[currency] || currency || ""}`.trim();
 }
 
 function fmtStamp(ms) {
@@ -139,7 +140,7 @@ function fmtStamp(ms) {
   return new Date(ms).toLocaleString("ru-RU", sameDay ? { hour: "2-digit", minute: "2-digit" } : { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
-const fmtSigned = (v) => `${fmtPct.format(v).replace("-", "−")} %`;
+const fmtSigned = (v) => `${fmtPct.format(v).replace("-", "−")}${NBSP}%`;
 
 // ---------- Отрисовка ----------
 
@@ -240,12 +241,14 @@ function render() {
   renderStatus();
 }
 
+const fmtFull = (ms) => new Date(ms).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
 function renderStatus() {
-  const box = $("updated");
+  const line = $("prices-line");
   const ok = assets.filter((a) => !a.failed).length;
-  box.classList.toggle("ok", ok === assets.length);
-  box.classList.toggle("error", ok === 0);
-  const at = new Date(lastRefresh).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  line.classList.toggle("ok", ok === assets.length);
+  line.classList.toggle("error", ok === 0);
+  const at = fmtFull(lastRefresh);
   $("updated-text").textContent =
     ok === 0
       ? `Не удалось получить цены (${at}). Проверьте интернет или адрес Worker в js/config.js.`
@@ -258,6 +261,100 @@ function tick() {
   if (!lastRefresh) return;
   const left = Math.max(0, Math.round((lastRefresh + REFRESH_MS - Date.now()) / 1000));
   $("next").textContent = document.hidden ? "" : `· следующее через ${left} с`;
+}
+
+// ---------- Ставки и инфляция: data/data.json, его раз в день собирает GitHub Actions ----------
+
+const STALE_AFTER = 2 * DAY;
+const INFLATION_HINT = "На сколько процентов подорожали товары и услуги за год.";
+const RATE_TILES = [
+  { key: "fedRate", meet: "fedMeetings", title: "Ставка ФРС", region: "США", hint: "Коридор, в котором банки США одалживают друг другу деньги на ночь. Его задаёт ФРС." },
+  { key: "ecbRate", meet: "ecbMeetings", title: "Ставка ЕЦБ", region: "еврозона", hint: "Процент, который ЕЦБ платит банкам за деньги на депозите, — главная ставка еврозоны." },
+  { key: "nbpRate", meet: "nbpMeetings", title: "Ставка НБП", region: "Польша", hint: "Референсная ставка Нацбанка Польши: от неё зависят проценты по кредитам и вкладам в злотых." },
+];
+const MACRO_TILES = [
+  { key: "usInflation", title: "Инфляция", region: "США", hint: INFLATION_HINT },
+  { key: "euInflation", title: "Инфляция", region: "еврозона", hint: INFLATION_HINT },
+  { key: "plInflation", title: "Инфляция", region: "Польша", hint: INFLATION_HINT },
+  { key: "usUnemployment", title: "Безработица", region: "США", hint: "Доля людей, которые ищут работу и пока не нашли." },
+];
+
+let daily = null;
+
+const isoToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const fmtDate = (iso, opts = { day: "numeric", month: "long", year: "numeric" }) => new Date(`${iso}T12:00:00`).toLocaleDateString("ru-RU", opts);
+const fmtMonth = (period) => fmtDate(`${period}-15`, { month: "long", year: "numeric" });
+const fmtRate = (v, d) => `${nf(d).format(v)}${NBSP}%`;
+const fmtRange = (low, high) => (low != null ? `${nf(2).format(low)}–${fmtRate(high, 2)}` : fmtRate(high, 2));
+const NA = `<p class="tile-value na">нет данных</p>`;
+
+function daysWord(n) {
+  const [m10, m100] = [n % 10, n % 100];
+  if (m10 === 1 && m100 !== 11) return "день";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "дня";
+  return "дней";
+}
+
+function tile(def, body, item) {
+  const stale =
+    item && Date.now() - Date.parse(item.checkedAt) > STALE_AFTER
+      ? `<p class="note warn">⚠ не обновлялось с ${fmtDate(item.checkedAt.slice(0, 10), { day: "numeric", month: "long" })}</p>`
+      : "";
+  const src = item ? `<a class="tile-src" href="${esc(item.url)}" target="_blank" rel="noopener">Источник: ${esc(item.source)}</a>` : "";
+  return `<article class="tile">
+    <h4 class="tile-label">${def.title} <span class="tile-region">· ${def.region}</span> ${tipButton(def.hint)}</h4>
+    ${body}${stale}${src}
+  </article>`;
+}
+
+function nextMeeting(m) {
+  const today = isoToday();
+  const next = m?.dates.find((d) => d >= today);
+  if (!next) return `<p class="tile-next">Следующее решение: нет данных</p>`;
+  const days = Math.round((Date.parse(`${next}T12:00:00`) - Date.parse(`${today}T12:00:00`)) / DAY);
+  const when = days === 0 ? "сегодня" : days === 1 ? "завтра" : `через ${days}${NBSP}${daysWord(days)}`;
+  return `<p class="tile-next">Следующее решение: <strong>${fmtDate(next, { day: "numeric", month: "long" })}</strong> (${when})</p>`;
+}
+
+function rateTile(def, items) {
+  const r = items[def.key];
+  const meta = r && [r.since && `с ${fmtDate(r.since)}`, r.prev != null && `было ${fmtRange(r.prevLow, r.prev)}`].filter(Boolean).join(" · ");
+  const body = r ? `<p class="tile-value">${fmtRange(r.low, r.value)}</p>${meta ? `<p class="tile-meta">${meta}</p>` : ""}` : NA;
+  return tile(def, body + nextMeeting(items[def.meet]), r);
+}
+
+function macroTile(def, items) {
+  const x = items[def.key];
+  const prev = x?.prev != null ? ` · месяцем ранее ${fmtRate(x.prev, 1)}` : "";
+  const body = x
+    ? `<p class="tile-value">${fmtRate(x.value, 1)}</p>
+       <p class="tile-meta">за ${fmtMonth(x.period)}${x.preliminary ? " (предварительно)" : ""}${prev}</p>`
+    : NA;
+  return tile(def, body, x);
+}
+
+function renderDaily(failed) {
+  const items = daily?.items || {};
+  $("rates-tiles").innerHTML = RATE_TILES.map((d) => rateTile(d, items)).join("");
+  $("macro-tiles").innerHTML = MACRO_TILES.map((d) => macroTile(d, items)).join("");
+  const line = $("daily-line");
+  line.classList.toggle("ok", !failed);
+  line.classList.toggle("error", failed);
+  $("daily-text").textContent = failed
+    ? "Ставки и инфляция: не удалось загрузить данные."
+    : `Ставки и инфляция обновлены: ${fmtFull(Date.parse(daily.generatedAt))} (раз в день)`;
+}
+
+async function loadDaily() {
+  try {
+    daily = await getJSON("data/data.json", true);
+    renderDaily(false);
+  } catch {
+    renderDaily(true);
+  }
 }
 
 // ---------- Подсказки и наведение на график ----------
@@ -348,4 +445,6 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden && Date.now() - lastRefresh >= REFRESH_MS) refresh();
 });
 setInterval(tick, 1000);
+setInterval(loadDaily, HOUR);
 refresh();
+loadDaily();
