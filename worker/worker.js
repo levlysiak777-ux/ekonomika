@@ -4,6 +4,7 @@
 //
 // Запрос:  /chart?symbol=^GSPC&range=2d   → цены за последние ~25 часов с шагом 5 минут
 //          /chart?symbol=^GSPC&range=1y   → дневные цены закрытия за год
+//          /chart?symbol=AAPL&range=max   → цены закрытия по месяцам за всю историю (кнопка «Всё время»)
 // Ответ:   { symbol, currency, price, time, prevClose, t: [секунды], c: [цены] }
 //          prevClose — цена закрытия прошлого торгового дня.
 //
@@ -12,9 +13,9 @@
 //
 // Этот же файл используется локально в server.js.
 
-const INTERVALS = { "2d": "5m", "1y": "1d" };
-const BROWSER_CACHE_SECONDS = { "2d": 0, "1y": 3600 };
-const KEEP_SECONDS = { "2d": 25 * 3600, "1y": Infinity }; // лишнее не отправляем, чтобы ответ был маленьким
+const INTERVALS = { "2d": "5m", "1y": "1d", max: "1mo" };
+const BROWSER_CACHE_SECONDS = { "2d": 0, "1y": 3600, max: 86400 };
+const KEEP_SECONDS = { "2d": 25 * 3600, "1y": Infinity, max: Infinity }; // лишнее не отправляем, чтобы ответ был маленьким
 
 export default {
   async fetch(request) {

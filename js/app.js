@@ -25,6 +25,9 @@ const sparks = new Map(); // id мини-графика → точки и мас
 let lastRefresh = 0;
 let timer = null;
 let busy = false;
+let focus = null; // id компании, открытой в большом графике
+let focusRange = "m1";
+let focusWidth = 0;
 
 const $ = (id) => document.getElementById(id);
 const phone = matchMedia("(max-width: 720px)");
@@ -108,13 +111,18 @@ function view(a, now) {
     ch.w1 = pct(L.price, closeOn(H, now - 7 * DAY));
     ch.m1 = pct(L.price, closeOn(H, monthsAgo(now, 1)));
     ch.y1 = pct(L.price, closeOn(H, monthsAgo(now, 12)));
-    const from = monthsAgo(now, 1);
-    spark = H.t
-      .map((t, i) => [t * 1000, H.c[i]])
-      .filter(([t, v]) => v != null && t >= from && dayKey(t) !== dayKey(time));
-    spark.push([time, L.price]);
+    spark = histPoints(H, monthsAgo(now, 1), time, L.price);
   }
   return { price: L.price, currency: L.currency, time, closed, ch, spark };
+}
+
+// Точки графика: цены закрытия начиная с from (мс), последней — текущая цена.
+function histPoints(H, from, time, price) {
+  const points = H.t
+    .map((t, i) => [t * 1000, H.c[i]])
+    .filter(([t, v]) => v != null && t >= from && dayKey(t) !== dayKey(time));
+  points.push([time, price]);
+  return points;
 }
 
 // ---------- Форматирование ----------
@@ -156,14 +164,13 @@ function headHtml(first) {
   </tr>`;
 }
 
+const chgClass = (value) => (Math.abs(value) < 0.005 ? "flat" : value > 0 ? "up" : "down");
+const naWhy = (v, key) => (key === "h1" && v.closed ? "Биржа закрыта — за последний час цена не менялась" : "нет данных");
+
 function changeCell(v, key, label) {
   const value = v.ch[key];
-  if (value == null) {
-    const why = key === "h1" && v.closed ? "Биржа закрыта — за последний час цена не менялась" : "нет данных";
-    return `<td class="chg na" data-label="${label}" title="${why}">—</td>`;
-  }
-  const cls = Math.abs(value) < 0.005 ? "flat" : value > 0 ? "up" : "down";
-  return `<td class="chg ${cls}" data-label="${label}">${fmtSigned(value)}</td>`;
+  if (value == null) return `<td class="chg na" data-label="${label}" title="${naWhy(v, key)}">—</td>`;
+  return `<td class="chg ${chgClass(value)}" data-label="${label}">${fmtSigned(value)}</td>`;
 }
 
 function sparkSvg(a, points, currency) {
@@ -186,14 +193,21 @@ function sparkSvg(a, points, currency) {
   </svg>`;
 }
 
+function rowNote(a, v) {
+  if (v && a.failed) return `<span class="note warn">⚠ не обновилось · данные на ${fmtStamp(a.liveAt)}</span>`;
+  if (v?.closed) return `<span class="note">биржа закрыта · цена на ${fmtStamp(v.time)}</span>`;
+  return "";
+}
+
 function rowHtml(a, now) {
   const v = view(a, now);
-  let note = "";
-  if (v && a.failed) note = `<span class="note warn">⚠ не обновилось · данные на ${fmtStamp(a.liveAt)}</span>`;
-  else if (v?.closed) note = `<span class="note">биржа закрыта · цена на ${fmtStamp(v.time)}</span>`;
-  const name = `<th scope="row" class="c-name"><span class="name">${esc(a.name)}</span><span class="hint">${esc(a.hint)}</span>${note}</th>`;
-  if (!v) return `<tr>${name}<td class="nodata" colspan="7">нет данных — источник не ответил</td></tr>`;
-  return `<tr>${name}
+  // Компанию можно открыть: нажатие на строку показывает большой график наверху блока.
+  const open = a.section === "companies";
+  const tr = open ? `<tr data-open="${a.id}"${a.id === focus ? ` class="sel"` : ""}>` : "<tr>";
+  const title = open ? `<button type="button" class="name">${esc(a.name)}</button>` : `<span class="name">${esc(a.name)}</span>`;
+  const name = `<th scope="row" class="c-name">${title}<span class="hint">${esc(a.hint)}</span>${rowNote(a, v)}</th>`;
+  if (!v) return `${tr}${name}<td class="nodata" colspan="7">нет данных — источник не ответил</td></tr>`;
+  return `${tr}${name}
     <td class="c-price">${fmtPrice(a, v.price, v.currency)}</td>
     ${PERIODS.map(([key, , label]) => changeCell(v, key, label)).join("")}
     <td class="c-spark">${sparkSvg(a, v.spark, v.currency)}</td>
@@ -216,8 +230,8 @@ function renderTable(id, list, now) {
 // «Топ-5 растут / падают»: компании с самым большим изменением за день.
 function renderMovers(now) {
   const withDay = companies.map((a) => ({ a, v: view(a, now) })).filter(({ v }) => v?.ch.d1 != null);
-  const item = ({ a, v }) => `<li>
-      <span class="m-name">${esc(a.name)}</span>
+  const item = ({ a, v }) => `<li data-open="${a.id}">
+      <button type="button" class="m-name">${esc(a.name)}</button>
       <span class="m-price">${fmtPrice(a, v.price, v.currency)}</span>
       <span class="chg ${v.ch.d1 > 0 ? "up" : "down"}">${fmtSigned(v.ch.d1)}</span>
     </li>`;
@@ -233,12 +247,169 @@ function renderMovers(now) {
   fill("movers-down", withDay.filter(({ v }) => v.ch.d1 <= -0.005).sort(byDay).reverse().slice(0, 5), "Ни одна компания из списка не упала");
 }
 
+// ---------- Большой график компании ----------
+
+// Кнопки периода. axis — подписи дат под графиком, tip — дата в подсказке при наведении.
+const FOCUS_RANGES = [
+  { key: "d1", title: "День", what: "за день", axis: { hour: "2-digit", minute: "2-digit" }, tip: { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" } },
+  { key: "m1", title: "Месяц", what: "за месяц", axis: { day: "numeric", month: "short" }, tip: { day: "numeric", month: "long" } },
+  { key: "y1", title: "Год", what: "за год", axis: { month: "short", year: "numeric" }, tip: { day: "numeric", month: "long", year: "numeric" } },
+  { key: "max", title: "Всё время", what: "за всё время", axis: { year: "numeric" }, tip: { month: "long", year: "numeric" } },
+];
+
+// История за всё время нужна редко — загружаем, только когда нажали «Всё время».
+async function loadMax(a) {
+  a.maxState = "loading";
+  try {
+    a.max = await getJSON(`${PROXY}/chart?symbol=${encodeURIComponent(a.symbol)}&range=max`);
+    a.maxState = "ok";
+  } catch {
+    a.maxState = "failed";
+  }
+  renderFocus();
+}
+
+function focusPoints(a, v, key, now) {
+  if (key === "d1") {
+    // Акции — последний торговый день, криптовалюты — последние 24 часа.
+    const L = a.live;
+    const points = L.t
+      .map((t, i) => [t * 1000, L.c[i]])
+      .filter(([t]) => (a.kind === "crypto" ? t >= v.time - DAY : dayKey(t) === dayKey(v.time)));
+    if (!points.length || points.at(-1)[0] < v.time) points.push([v.time, v.price]);
+    return points;
+  }
+  const H = key === "max" ? a.max : a.hist;
+  if (!H) return [];
+  return histPoints(H, key === "m1" ? monthsAgo(now, 1) : key === "y1" ? monthsAgo(now, 12) : 0, v.time, v.price);
+}
+
+// «Круглые» значения для линий сетки: шаг 1, 2 или 5 × 10ⁿ.
+function niceTicks(lo, hi) {
+  const raw = (hi - lo) / 5;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+  const ticks = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + step / 1e6; v += step) ticks.push(v);
+  return { ticks, digits: Math.max(0, -Math.floor(Math.log10(step))) };
+}
+
+function bigChartSvg(a, points, currency, range, base, cls) {
+  const W = focusWidth;
+  const H = phone.matches ? 200 : 260;
+  const [P, B] = [8, 24]; // поля и место под даты внизу
+  const ys = points.map((p) => p[1]);
+  if (base != null) ys.push(base);
+  let [lo, hi] = [Math.min(...ys), Math.max(...ys)];
+  if (hi - lo < hi * 1e-6) [lo, hi] = [lo * 0.99, hi * 1.01];
+  const { ticks, digits } = niceTicks(lo, hi);
+  const labels = ticks.map((v) => nf(digits).format(v));
+  const R = 12 + Math.max(...labels.map((s) => s.length)) * 7; // место под цены справа
+  const [x0, x1] = [points[0][0], points.at(-1)[0]];
+  const bottom = H - B - P;
+  const X = (t) => P + ((W - R - P) * (t - x0)) / (x1 - x0 || 1);
+  const Y = (v) => P + ((bottom - P) * (hi - v)) / (hi - lo);
+  const d = points.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+  const grid = ticks
+    .map((v, i) => `<line class="grid" x1="${P}" x2="${W - R + 6}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/>
+      <text x="${W}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${labels[i]}</text>`)
+    .join("");
+  const dates = [
+    [x0, "start"],
+    [(x0 + x1) / 2, "middle"],
+    [x1, "end"],
+  ]
+    .map(([t, anchor]) => `<text x="${X(t).toFixed(1)}" y="${H - 6}" text-anchor="${anchor}">${new Date(t).toLocaleString("ru-RU", range.axis)}</text>`)
+    .join("");
+  const baseLine = base == null ? "" : `<line class="base" x1="${P}" x2="${W - R}" y1="${Y(base).toFixed(1)}" y2="${Y(base).toFixed(1)}"/>`;
+  sparks.set("focus", { a, points, currency, X, Y, tip: range.tip });
+  return `<svg class="spark big ${cls}" data-id="focus" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+      role="img" aria-label="${esc(a.name)}: график ${range.what}">
+    ${grid}${dates}${baseLine}
+    <line class="cross" y1="${P}" y2="${bottom}"/>
+    <path d="${d}"/>
+    <circle class="end" cx="${X(x1).toFixed(1)}" cy="${Y(points.at(-1)[1]).toFixed(1)}" r="4"/>
+    <circle class="hover" r="5"/>
+  </svg>`;
+}
+
+function renderFocus() {
+  const box = $("focus");
+  const a = companies.find((x) => x.id === focus);
+  box.hidden = !a;
+  if (!a) return;
+  const now = Date.now();
+  const v = view(a, now);
+  const range = FOCUS_RANGES.find((r) => r.key === focusRange);
+  if (v && range.key === "max" && !a.maxState) loadMax(a);
+  const points = v ? focusPoints(a, v, range.key, now) : [];
+  const change = !v ? null : range.key === "max" ? (points.length > 1 ? pct(v.price, points[0][1]) : null) : v.ch[range.key];
+  const cls = change == null ? "flat" : chgClass(change);
+  // Для дня рисуем пунктиром вчерашнюю цену закрытия: от неё считается изменение за день.
+  const base = range.key === "d1" && a.kind !== "crypto" ? a.live?.prevClose : null;
+  const stats = v
+    ? `<div class="focus-stats">${PERIODS.map(([key, title]) => {
+        const x = v.ch[key];
+        return `<div><span class="fs-label">${title}</span>${
+          x == null ? `<span class="chg na" title="${naWhy(v, key)}">—</span>` : `<span class="chg ${chgClass(x)}">${fmtSigned(x)}</span>`
+        }</div>`;
+      }).join("")}</div>`
+    : "";
+
+  box.innerHTML = `<div class="focus-head">
+      <div>
+        <p class="focus-group">${esc(a.group)}</p>
+        <h3 class="focus-name">${esc(a.name)}</h3>
+        <p class="hint">${esc(a.hint)}</p>
+      </div>
+      <button type="button" class="focus-close" data-close aria-label="Закрыть большой график">×</button>
+    </div>
+    ${v ? `<p class="focus-price"><strong>${fmtPrice(a, v.price, v.currency)}</strong>
+      <span class="chg ${change == null ? "na" : cls}">${change == null ? "нет данных" : fmtSigned(change)} ${range.what}</span></p>` : ""}
+    <div class="seg" role="group" aria-label="Период графика">
+      ${FOCUS_RANGES.map((r) => `<button type="button" data-range="${r.key}" aria-pressed="${r.key === range.key}">${r.title}</button>`).join("")}
+    </div>
+    <div class="focus-chart" id="focus-chart"></div>
+    ${base != null ? `<p class="note">Пунктир — цена закрытия прошлого торгового дня, от неё считается изменение за день.</p>` : ""}
+    ${rowNote(a, v)}
+    ${stats}`;
+
+  const chart = $("focus-chart");
+  focusWidth = chart.clientWidth;
+  chart.innerHTML =
+    range.key === "max" && a.maxState === "loading"
+      ? `<p class="focus-msg">Загружаю историю…</p>`
+      : points.length < 2
+        ? `<p class="focus-msg">нет данных — источник не ответил</p>`
+        : bigChartSvg(a, points, v.currency, range, base, cls);
+}
+
+function openFocus(id) {
+  focus = id;
+  render();
+  if (id) $("focus").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+document.addEventListener("click", (e) => {
+  const rangeBtn = e.target.closest?.("[data-range]");
+  const row = e.target.closest?.("[data-open]");
+  if (rangeBtn) {
+    focusRange = rangeBtn.dataset.range;
+    const a = companies.find((x) => x.id === focus);
+    if (focusRange === "max" && a?.maxState === "failed") a.maxState = null; // нажали ещё раз — пробуем снова
+    renderFocus();
+  } else if (e.target.closest?.("[data-close]")) openFocus(null);
+  else if (row) openFocus(row.dataset.open === focus ? null : row.dataset.open);
+});
+addEventListener("resize", () => focus && $("focus-chart")?.clientWidth !== focusWidth && renderFocus());
+
 function render() {
   const now = Date.now();
   sparks.clear();
   renderTable("markets-body", markets, now);
   renderTable("companies-body", companies, now);
   renderMovers(now);
+  renderFocus();
   renderStatus();
 }
 
@@ -510,7 +681,7 @@ function onSparkMove(e) {
   svg.querySelector(".hover").setAttribute("cx", cx);
   svg.querySelector(".hover").setAttribute("cy", cy);
   svg.classList.add("active");
-  const date = new Date(best[0]).toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+  const date = new Date(best[0]).toLocaleString("ru-RU", s.tip || { day: "numeric", month: "long" });
   showTooltip(`${date}<br><strong>${fmtPrice(s.a, best[1], s.currency)}</strong>`, rect.left + cx, rect.top + cy, "spark");
 }
 

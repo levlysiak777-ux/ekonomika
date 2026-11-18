@@ -16,6 +16,10 @@
   --accent: #2a78d6;
   --tooltip-bg: #0b0b0b;
   --tooltip-text: #f0efec;
+  /* фон за карточками: цветные пятна и сетка, как на миллиметровке */
+  --glow-1: rgba(42, 120, 214, 0.14);
+  --glow-2: rgba(0, 99, 0, 0.08);
+  --bg-line: rgba(11, 11, 11, 0.045);
 }
 
 /* ---------- Тёмная тема: по системе или по кнопке ---------- */
@@ -37,6 +41,9 @@
     --accent: #3987e5;
     --tooltip-bg: #f0efec;
     --tooltip-text: #0b0b0b;
+    --glow-1: rgba(57, 135, 229, 0.2);
+    --glow-2: rgba(12, 163, 12, 0.09);
+    --bg-line: rgba(255, 255, 255, 0.04);
   }
 }
 :root[data-theme="dark"] {
@@ -56,6 +63,9 @@
   --accent: #3987e5;
   --tooltip-bg: #f0efec;
   --tooltip-text: #0b0b0b;
+  --glow-1: rgba(57, 135, 229, 0.2);
+  --glow-2: rgba(12, 163, 12, 0.09);
+  --bg-line: rgba(255, 255, 255, 0.04);
 }
 
 /* ---------- Основа ---------- */
@@ -66,6 +76,17 @@ body {
   background: var(--page);
   color: var(--text);
   font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+/* Фон: стоит на месте при прокрутке, сетка плавно исчезает к низу экрана */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(70vw 60vh at 0% 0%, var(--glow-1), transparent 70%),
+    radial-gradient(60vw 55vh at 100% 15%, var(--glow-2), transparent 70%),
+    linear-gradient(var(--bg-line) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, var(--bg-line) 1px, transparent 1px) 0 0 / 40px 40px;
+  -webkit-mask-image: linear-gradient(#000 0%, #000 35%, transparent 95%);
+  mask-image: linear-gradient(#000 0%, #000 35%, transparent 95%);
 }
 h1, h2, p { margin: 0; }
 .page { max-width: 1120px; margin: 0 auto; padding: 24px 16px 40px; }
@@ -153,6 +174,56 @@ h2 { font-size: 20px; line-height: 1.25; }
 .spark .cross { stroke: var(--muted); stroke-width: 1; visibility: hidden; }
 .spark .hover { fill: var(--text); stroke: var(--surface); stroke-width: 2; visibility: hidden; }
 .spark.active .cross, .spark.active .hover { visibility: visible; }
+
+/* Строки компаний можно нажать — откроется большой график */
+[data-open] { cursor: pointer; }
+.quotes tr[data-open]:hover, .quotes tr.sel { background: var(--surface-2); }
+.quotes tr.sel .name, .movers li[data-open]:hover .m-name { color: var(--accent); }
+button.name, button.m-name {
+  padding: 0; border: 0; background: none; color: inherit;
+  font: inherit; font-weight: 600; text-align: left; cursor: pointer;
+}
+
+/* Большой график компании */
+.focus { margin-bottom: 16px; padding: 16px; border-radius: 12px; background: var(--surface-2); scroll-margin-top: 12px; }
+.focus-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.focus-group { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.focus-name { margin: 2px 0 0; font-size: 24px; line-height: 1.2; }
+.focus-close {
+  flex: none; width: 36px; height: 36px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-size: 22px; line-height: 1; cursor: pointer;
+}
+.focus-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin-top: 10px; }
+.focus-price strong { font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.focus-price .chg { font-weight: 600; }
+.seg {
+  display: inline-flex; gap: 2px; margin-top: 12px; padding: 3px;
+  border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
+}
+.seg button {
+  padding: 6px 14px; border: 0; border-radius: 7px; background: none;
+  color: var(--text-2); font: inherit; font-size: 14px; cursor: pointer;
+}
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--surface); font-weight: 600; }
+.focus-chart { margin-top: 14px; }
+.focus-msg { padding: 48px 0; text-align: center; color: var(--muted); }
+.spark.big { margin: 0; }
+.spark.big .grid { stroke: var(--grid); stroke-width: 1; }
+.spark.big .base { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.spark.big text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.spark.big.flat path { stroke: var(--text-2); }
+.spark.big.flat .end { fill: var(--text-2); }
+.spark.big .end, .spark.big .hover { stroke: var(--surface-2); }
+.focus .note { margin-top: 6px; }
+.focus-stats {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--grid);
+  text-align: center; font-variant-numeric: tabular-nums;
+}
+.fs-label { display: block; color: var(--muted); font-size: 12px; }
+.focus-stats .chg { font-weight: 600; white-space: nowrap; }
 
 /* Кнопка-подсказка «?» */
 .tip {
@@ -268,6 +339,12 @@ h3 { margin: 0 0 6px; font-size: 15px; }
   .quotes .nodata { grid-column: 1 / -1; grid-row: 3; }
   .movers { grid-template-columns: 1fr; }
   .duo { grid-template-columns: 1fr; gap: 0; }
+  .focus { padding: 12px; }
+  .focus-name { font-size: 20px; }
+  .focus-price strong { font-size: 26px; }
+  .seg { display: flex; }
+  .seg button { flex: 1 1 auto; padding: 7px 6px; font-size: 13px; white-space: nowrap; }
+  .focus-stats { gap: 4px; font-size: 13px; }
   /* точка слева, длинный текст переносится рядом с ней, а не уходит на новую строку */
   .updated-line { display: grid; grid-template-columns: 8px 1fr; align-items: start; }
   .updated .dot { margin-top: 7px; }
