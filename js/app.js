@@ -1,4 +1,5 @@
 import { CONFIG } from "./config.js";
+import { WORDS } from "./words.js";
 
 const PROXY = (CONFIG.quotesProxy || "/api").replace(/\/+$/, "");
 const REFRESH_MS = CONFIG.refreshSeconds * 1000;
@@ -413,17 +414,56 @@ function renderEvents(items) {
   $("events-src").innerHTML = sources.length ? `Источники: ${sources.join(", ")}.` : "";
 }
 
+// ---------- Главное за день и слово дня ----------
+
+const fmtNewsTime = (iso) => new Date(iso).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+// Ссылка из чужой ленты: пропускаем только обычные веб-адреса.
+const safeUrl = (u) => (/^https?:\/\//i.test(u) ? u : "#");
+
+function renderNews(items) {
+  const x = items.news;
+  if (!x) {
+    $("news").innerHTML = `<p class="ev-empty">нет данных — источник не ответил</p>`;
+    $("news-notes").innerHTML = "";
+    return;
+  }
+  $("news").innerHTML = x.list.length
+    ? `<ul class="news-list">${x.list
+        .map(
+          (n) => `<li class="news-item">
+        <a class="news-title" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">${esc(n.title)}</a>
+        ${n.text ? `<p class="news-text">${esc(n.text)}</p>` : ""}
+        <p class="news-meta">${esc(n.source)} · ${fmtNewsTime(n.time)}</p>
+      </li>`,
+        )
+        .join("")}</ul>`
+    : `<p class="ev-empty">За последние сутки новостей в лентах не было.</p>`;
+  const notes = x.missing.map((name) => `<p class="note">нет данных: ${esc(name)} — источник не ответил</p>`);
+  if (isStale(x)) notes.unshift(`<p class="note warn">⚠ новости не обновлялись с ${fmtDay(x.checkedAt.slice(0, 10))}</p>`);
+  $("news-notes").innerHTML = notes.join("");
+}
+
+// Каждый день — следующее слово из словаря, по кругу.
+function renderWord() {
+  const [y, m, d] = isoToday().split("-").map(Number);
+  const w = WORDS[Math.round(Date.UTC(y, m - 1, d) / DAY) % WORDS.length];
+  $("word-term").textContent = w.term;
+  $("word-text").textContent = w.text;
+}
+
 function renderDaily(failed) {
   const items = daily?.items || {};
   $("rates-tiles").innerHTML = RATE_TILES.map((d) => rateTile(d, items)).join("");
   $("macro-tiles").innerHTML = MACRO_TILES.map((d) => macroTile(d, items)).join("");
   renderEvents(items);
+  renderNews(items);
+  renderWord();
   const line = $("daily-line");
   line.classList.toggle("ok", !failed);
   line.classList.toggle("error", failed);
   $("daily-text").textContent = failed
-    ? "Ставки, инфляция и календарь: не удалось загрузить данные."
-    : `Ставки, инфляция и календарь обновлены: ${fmtFull(Date.parse(daily.generatedAt))} (раз в день)`;
+    ? "Ставки, календарь и новости: не удалось загрузить данные."
+    : `Ставки, календарь и новости обновлены: ${fmtFull(Date.parse(daily.generatedAt))} (раз в день)`;
 }
 
 async function loadDaily() {

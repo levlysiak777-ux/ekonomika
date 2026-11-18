@@ -1,4 +1,4 @@
-// Ежедневный сбор данных для сайта: ставки центробанков, инфляция, безработица, даты заседаний, календарь «Что ждать».
+// Ежедневный сбор данных для сайта: ставки центробанков, инфляция, безработица, даты заседаний, календарь «Что ждать», новости.
 //
 // Запуск у себя:   npm run update-data      (ключ FRED берётся из файла .env)
 // Запуск в GitHub: .github/workflows/update-data.yml, раз в день по расписанию
@@ -116,6 +116,33 @@ const BIG_COMPANY_CAP = 200e9;
 const EARNINGS_TIME = { "time-pre-market": "до открытия биржи в США", "time-after-hours": "после закрытия биржи в США" };
 // «Palo Alto Networks, Inc.» → «Palo Alto Networks», «Alibaba Group Holding Limited» → «Alibaba»
 const shortName = (name) => name.replace(/,?\s+(Group|Holdings?|Inc|Incorporated|Corp|Corporation|Company|Ltd|Limited|plc|N\.V|S\.A|SE|AG)\b.*$/i, "");
+
+// ---------- «Главное за день» ----------
+
+// Ленты экономических новостей на русском. Заголовки показываем как есть, со ссылкой на источник.
+const NEWS_FEEDS = [
+  { name: "Investing.com", url: "https://ru.investing.com/rss/news_14.rss" }, // экономика
+  { name: "Investing.com", url: "https://ru.investing.com/rss/news_95.rss" }, // экономические показатели
+  { name: "DW", url: "https://rss.dw.com/xml/rss-ru-eco" }, // экономика
+];
+const NEWS_COUNT = 5;
+const NEWS_PER_FEED = 2; // чтобы одна лента не заняла весь блок
+const NEWS_MAX_AGE = 36 * 3600_000; // «за день»: не старше полутора суток на момент сбора
+
+const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+// Текст тега RSS без CDATA, HTML-сущностей и тегов.
+function rssTag(item, name) {
+  const raw = item.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`))?.[1] ?? "";
+  return raw
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&(#x[\da-f]+|#\d+|\w+);/gi, (m, e) =>
+      e[0] !== "#" ? (ENTITIES[e] ?? m) : String.fromCodePoint(e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : Number(e.slice(1))),
+    )
+    .replace(/<[^>]+>/g, "")
+    .trim();
+}
+// DW пишет дату как «Tue, 17 Nov 2026 20:28:00 GMT», Investing.com — «2026-11-17 19:53:34» по UTC.
+const rssTime = (s) => Date.parse(/^\d{4}-\d\d-\d\d \d/.test(s) ? `${s.replace(" ", "T")}Z` : s);
 
 const tasks = {
   async fedRate() {
@@ -280,6 +307,42 @@ const tasks = {
       }
     }
     return { events, source: "Nasdaq", url: "https://www.nasdaq.com/market-activity/earnings" };
+  },
+
+  // Самые свежие новости из всех лент. Если ответили не все ленты, показываем то, что есть,
+  // а молчавшие перечисляем в missing — сайт напишет про них «нет данных».
+  async news() {
+    const missing = new Set();
+    const lists = await Promise.all(
+      NEWS_FEEDS.map(async (feed) => {
+        let xml;
+        try {
+          xml = await get(feed.url, "text");
+        } catch (err) {
+          console.error(`  лента ${feed.url}: ${err.message}`);
+          missing.add(feed.name);
+          return [];
+        }
+        return [...xml.matchAll(/<item[\s>][\s\S]*?<\/item>/g)]
+          .map(([item]) => ({
+            title: rssTag(item, "title"),
+            text: rssTag(item, "description") || null,
+            url: rssTag(item, "link"),
+            time: rssTime(rssTag(item, "pubDate")),
+            source: feed.name,
+          }))
+          .filter((n) => n.title && /^https?:\/\//.test(n.url) && Date.now() - n.time < NEWS_MAX_AGE)
+          .sort((a, b) => b.time - a.time)
+          .slice(0, NEWS_PER_FEED);
+      }),
+    );
+    if (missing.size === new Set(NEWS_FEEDS.map((f) => f.name)).size) throw new Error("не ответила ни одна лента новостей");
+    const byUrl = new Map(lists.flat().map((n) => [n.url, n])); // одна новость может быть в двух лентах
+    const list = [...byUrl.values()]
+      .sort((a, b) => b.time - a.time)
+      .slice(0, NEWS_COUNT)
+      .map((n) => ({ ...n, time: new Date(n.time).toISOString() }));
+    return { list, missing: [...missing] };
   },
 };
 

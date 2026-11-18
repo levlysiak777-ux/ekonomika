@@ -222,6 +222,20 @@ h3 { margin: 0 0 6px; font-size: 15px; }
 .events-foot { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
 .events-foot a { color: inherit; }
 
+/* «Главное за день» и «Слово дня» рядом, на телефоне — друг под другом */
+.duo { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
+.news-list { margin: 0; padding: 0; list-style: none; }
+.news-item { padding: 10px 0; border-top: 1px solid var(--border); }
+.news-item:first-child { border-top: 0; padding-top: 0; }
+.news-title { color: var(--text); font-weight: 500; text-decoration: none; }
+.news-title:hover { text-decoration: underline; }
+.news-text { margin-top: 2px; color: var(--text-2); font-size: 14px; }
+.news-meta { margin-top: 4px; color: var(--muted); font-size: 12px; }
+#news-notes .note { margin-top: 8px; }
+.word-term { margin-top: 12px; font-size: 22px; font-weight: 600; line-height: 1.2; }
+.word-text { margin-top: 8px; color: var(--text-2); }
+.word-foot { margin-top: 12px; color: var(--muted); font-size: 12px; }
+
 /* ---------- Подвал ---------- */
 .foot { color: var(--text-2); font-size: 13px; text-align: center; padding-top: 8px; }
 .foot p + p { margin-top: 4px; }
@@ -253,4 +267,5 @@ h3 { margin: 0 0 6px; font-size: 15px; }
   }
   .quotes .nodata { grid-column: 1 / -1; grid-row: 3; }
   .movers { grid-template-columns: 1fr; }
+  .duo { grid-template-columns: 1fr; gap: 0; }
 }

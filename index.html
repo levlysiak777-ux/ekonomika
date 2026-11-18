@@ -31,7 +31,7 @@
       </div>
       <div class="updated-line" id="daily-line">
         <span class="dot" aria-hidden="true"></span>
-        <span id="daily-text">Загружаю ставки, инфляцию и календарь…</span>
+        <span id="daily-text">Загружаю ставки, календарь и новости…</span>
       </div>
       <p class="delay">Данные с задержкой до ~15 минут (бесплатный источник). Варшавская биржа — всегда на 15 минут.</p>
     </div>
@@ -96,12 +96,30 @@
         <p class="events-foot">Публикации польской статистики (GUS) и отчёты польских компаний сюда пока не попадают:
           у них нет открытого календаря, который можно читать автоматически. <span id="events-src"></span></p>
       </section>
+
+      <div class="duo">
+        <section class="card" aria-labelledby="news-title">
+          <div class="card-head">
+            <h2 id="news-title">Главное за день</h2>
+            <p class="sub">Свежие экономические новости на русском — заголовки как в источнике, по ссылке полный текст.</p>
+          </div>
+          <div id="news"></div>
+          <div id="news-notes"></div>
+        </section>
+
+        <section class="card word" aria-labelledby="word-title">
+          <h2 id="word-title">Слово дня</h2>
+          <p class="word-term" id="word-term"></p>
+          <p class="word-text" id="word-text"></p>
+          <p class="word-foot">Каждый день — новое понятие.</p>
+        </section>
+      </div>
     </main>
 
     <footer class="foot">
       <p class="disclaimer">Это не инвестиционная рекомендация.</p>
       <p>Сайт только показывает данные и не советует, что покупать или продавать.
-        Цены: Yahoo Finance. Ставки и инфляция: FRED, ЕЦБ, NBP, Eurostat, GUS. Календарь: ФРС, ЕЦБ, NBP, FRED, Eurostat, Nasdaq.</p>
+        Цены: Yahoo Finance. Ставки и инфляция: FRED, ЕЦБ, NBP, Eurostat, GUS. Календарь: ФРС, ЕЦБ, NBP, FRED, Eurostat, Nasdaq. Новости: Investing.com, DW.</p>
     </footer>
   </div>
 

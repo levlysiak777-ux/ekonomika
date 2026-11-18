@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T00:52:54.062Z",
+  "generatedAt": "2026-11-18T01:03:13.931Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-18T00:52:49.189Z"
+      "checkedAt": "2026-11-18T01:03:04.204Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-18T00:52:49.335Z"
+      "checkedAt": "2026-11-18T01:03:04.397Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-18T00:52:49.346Z"
+      "checkedAt": "2026-11-18T01:03:04.471Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": true,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-18T00:52:49.384Z"
+      "checkedAt": "2026-11-18T01:03:04.498Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-18T00:52:49.445Z"
+      "checkedAt": "2026-11-18T01:03:04.552Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-18T00:52:49.802Z"
+      "checkedAt": "2026-11-18T01:03:07.027Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-18T00:52:54.049Z"
+      "checkedAt": "2026-11-18T01:03:13.923Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-18T00:52:49.552Z"
+      "checkedAt": "2026-11-18T01:03:04.719Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-18T00:52:49.569Z"
+      "checkedAt": "2026-11-18T01:03:04.629Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-18T00:52:49.553Z"
+      "checkedAt": "2026-11-18T01:03:04.669Z"
     },
     "euReleases": {
       "events": [
@@ -128,7 +128,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-18T00:52:49.442Z"
+      "checkedAt": "2026-11-18T01:03:04.497Z"
     },
     "earnings": {
       "events": [
@@ -160,7 +160,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-18T00:52:49.980Z"
+      "checkedAt": "2026-11-18T01:03:05.109Z"
     },
     "usReleases": {
       "events": [
@@ -177,7 +177,48 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-18T00:52:49.604Z"
+      "checkedAt": "2026-11-18T01:03:10.564Z"
+    },
+    "news": {
+      "list": [
+        {
+          "title": "Торговый дефицит Японии в октябре сократился сильнее прогноза",
+          "text": null,
+          "url": "https://ru.investing.com/news/economic-indicators/article-3475463",
+          "time": "2026-11-18T00:17:53.000Z",
+          "source": "Investing.com"
+        },
+        {
+          "title": "\"Inside Deutsche Bank\": что раскрыла крупнейшая банковская утечка",
+          "text": "Ведение рискованного бизнеса в России и Колумбии, с Джеффри Эпштейном и олигархами, игнорирование предупреждений в погоне за богатыми клиентами - об этом и многом другом говорится в расследовании \"Inside Deutsche Bank\".",
+          "url": "https://www.dw.com/ru/inside-deutsche-bank-что-раскрыла-крупнейшая-банковская-утечка/a-79972937?maca=rus-rss-ru-eco-6382-xml-mrss",
+          "time": "2026-11-17T20:28:00.000Z",
+          "source": "DW"
+        },
+        {
+          "title": "Уильямс из ФРС: инфляция может потребовать новых повышений ставки",
+          "text": null,
+          "url": "https://ru.investing.com/news/economy-news/article-3475239",
+          "time": "2026-11-17T19:53:34.000Z",
+          "source": "Investing.com"
+        },
+        {
+          "title": "Citi видит первые признаки переноса цен на энергию",
+          "text": null,
+          "url": "https://ru.investing.com/news/economy-news/article-3475094",
+          "time": "2026-11-17T16:35:52.000Z",
+          "source": "Investing.com"
+        },
+        {
+          "title": "Производительность труда в Великобритании выросла на 2,5% в III квартале 2026 года",
+          "text": null,
+          "url": "https://ru.investing.com/news/economic-indicators/article-3474074",
+          "time": "2026-11-17T10:30:13.000Z",
+          "source": "Investing.com"
+        }
+      ],
+      "missing": [],
+      "checkedAt": "2026-11-18T01:03:04.529Z"
     }
   }
 }
