@@ -12,7 +12,7 @@
 export const CONFIG = {
   // Адрес вашего Cloudflare Worker, например "https://ekonomika.ваше-имя.workers.dev".
   // Пусто — сайт берёт котировки через локальный server.js (/api).
-  quotesProxy: "",
+  quotesProxy: "https://ekonomika-api.levlysiak777.workers.dev",
 
   // Как часто обновлять цены, пока вкладка открыта.
   refreshSeconds: 60,
