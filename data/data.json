@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-20T13:44:20.143Z",
+  "generatedAt": "2026-11-21T13:09:21.809Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-20T13:43:55.431Z"
+      "checkedAt": "2026-11-21T13:08:45.335Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-20T13:43:56.174Z"
+      "checkedAt": "2026-11-21T13:08:46.160Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-20T13:43:56.517Z"
+      "checkedAt": "2026-11-21T13:08:46.739Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-20T13:43:56.229Z"
+      "checkedAt": "2026-11-21T13:08:46.231Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-20T13:43:55.965Z"
+      "checkedAt": "2026-11-21T13:08:45.933Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-20T13:44:05.340Z"
+      "checkedAt": "2026-11-21T13:08:48.082Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-20T13:44:20.142Z"
+      "checkedAt": "2026-11-21T13:09:21.807Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-20T13:43:56.086Z"
+      "checkedAt": "2026-11-21T13:08:45.907Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-20T13:43:55.908Z"
+      "checkedAt": "2026-11-21T13:08:45.642Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-20T13:43:55.989Z"
+      "checkedAt": "2026-11-21T13:08:45.837Z"
     },
     "euReleases": {
       "events": [
@@ -123,7 +123,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-20T13:43:56.481Z"
+      "checkedAt": "2026-11-21T13:08:46.548Z"
     },
     "earnings": {
       "events": [
@@ -140,7 +140,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-20T13:43:56.609Z"
+      "checkedAt": "2026-11-21T13:08:46.483Z"
     },
     "usReleases": {
       "events": [
@@ -162,15 +162,22 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-20T13:44:03.428Z"
+      "checkedAt": "2026-11-21T13:08:51.901Z"
     },
     "news": {
       "list": [
         {
-          "title": "Британия и ЕС отложили сделки на полгода из-за оплаты обучения",
+          "title": "Goldman повысил рейтинг H-акций Китая на фоне роста прибыли",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3479682",
-          "time": "2026-11-20T11:06:10.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3480859",
+          "time": "2026-11-21T12:54:24.000Z",
+          "source": "Investing.com"
+        },
+        {
+          "title": "Франция отклонила проект бюджета ЕС из-за фермерских субсидий",
+          "text": null,
+          "url": "https://ru.investing.com/news/economy-news/article-3480852",
+          "time": "2026-11-21T11:38:45.000Z",
           "source": "Investing.com"
         },
         {
@@ -178,13 +185,6 @@
           "text": null,
           "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3479573",
           "time": "2026-11-20T10:19:44.000Z",
-          "source": "Investing.com"
-        },
-        {
-          "title": "Лагард: ИИ-угрозы в кибербезопасности — главный риск для финансов",
-          "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-93CH-3479566",
-          "time": "2026-11-20T10:15:14.000Z",
           "source": "Investing.com"
         },
         {
@@ -196,7 +196,7 @@
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-20T13:43:56.694Z"
+      "checkedAt": "2026-11-21T13:08:46.804Z"
     }
   }
 }
