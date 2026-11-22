@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T13:09:21.809Z",
+  "generatedAt": "2026-11-22T12:56:26.004Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-21T13:08:45.335Z"
+      "checkedAt": "2026-11-22T12:56:15.524Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-21T13:08:46.160Z"
+      "checkedAt": "2026-11-22T12:56:16.116Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-21T13:08:46.739Z"
+      "checkedAt": "2026-11-22T12:56:16.972Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-21T13:08:46.231Z"
+      "checkedAt": "2026-11-22T12:56:16.402Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-21T13:08:45.933Z"
+      "checkedAt": "2026-11-22T12:56:16.203Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-21T13:08:48.082Z"
+      "checkedAt": "2026-11-22T12:56:25.564Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-21T13:08:45.907Z"
+      "checkedAt": "2026-11-22T12:56:16.418Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-21T13:08:45.642Z"
+      "checkedAt": "2026-11-22T12:56:15.877Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-21T13:08:45.837Z"
+      "checkedAt": "2026-11-22T12:56:15.970Z"
     },
     "euReleases": {
       "events": [
@@ -123,7 +123,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-21T13:08:46.548Z"
+      "checkedAt": "2026-11-22T12:56:16.865Z"
     },
     "earnings": {
       "events": [
@@ -140,7 +140,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-21T13:08:46.483Z"
+      "checkedAt": "2026-11-22T12:56:16.790Z"
     },
     "usReleases": {
       "events": [
@@ -162,41 +162,27 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-21T13:08:51.901Z"
+      "checkedAt": "2026-11-22T12:56:22.152Z"
     },
     "news": {
       "list": [
         {
-          "title": "Goldman повысил рейтинг H-акций Китая на фоне роста прибыли",
+          "title": "Иран: контроль Ормуза; атаки на Бахрейн, Саудовскую Аравию растут.",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3480859",
-          "time": "2026-11-21T12:54:24.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3480947",
+          "time": "2026-11-22T08:10:19.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Франция отклонила проект бюджета ЕС из-за фермерских субсидий",
+          "title": "Австралия отклонила опасения США по подлодкам AUKUS",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3480852",
-          "time": "2026-11-21T11:38:45.000Z",
-          "source": "Investing.com"
-        },
-        {
-          "title": "Лагард: ЕЦБ расширит доступ к валютным своп-линиям",
-          "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3479573",
-          "time": "2026-11-20T10:19:44.000Z",
-          "source": "Investing.com"
-        },
-        {
-          "title": "Бюджет Португалии: рост ВВП в 2027 году составит 2,3%",
-          "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3479514",
-          "time": "2026-11-20T09:41:23.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3480941",
+          "time": "2026-11-22T06:43:55.000Z",
           "source": "Investing.com"
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-21T13:08:46.804Z"
+      "checkedAt": "2026-11-22T12:56:17.177Z"
     }
   }
 }
