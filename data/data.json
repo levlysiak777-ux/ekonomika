@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-23T15:32:14.871Z",
+  "generatedAt": "2026-11-24T15:26:17.916Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-23T15:31:43.722Z"
+      "checkedAt": "2026-11-24T15:25:25.416Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-23T15:31:44.156Z"
+      "checkedAt": "2026-11-24T15:25:25.914Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-23T15:31:44.715Z"
+      "checkedAt": "2026-11-24T15:25:27.084Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-23T15:31:44.684Z"
+      "checkedAt": "2026-11-24T15:25:26.641Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-23T15:31:44.142Z"
+      "checkedAt": "2026-11-24T15:25:26.537Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-23T15:31:56.886Z"
+      "checkedAt": "2026-11-24T15:25:29.008Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-23T15:32:14.869Z"
+      "checkedAt": "2026-11-24T15:26:17.914Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-23T15:31:44.201Z"
+      "checkedAt": "2026-11-24T15:25:26.366Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-23T15:31:44.254Z"
+      "checkedAt": "2026-11-24T15:25:25.719Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-23T15:31:44.312Z"
+      "checkedAt": "2026-11-24T15:25:25.743Z"
     },
     "euReleases": {
       "events": [
@@ -123,15 +123,10 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-23T15:31:44.819Z"
+      "checkedAt": "2026-11-24T15:25:27.092Z"
     },
     "earnings": {
       "events": [
-        {
-          "date": "2026-12-01",
-          "name": "CrowdStrike",
-          "when": "после закрытия биржи в США"
-        },
         {
           "date": "2026-12-03",
           "name": "Royal Bank Of Canada",
@@ -140,7 +135,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-23T15:31:44.589Z"
+      "checkedAt": "2026-11-24T15:25:26.910Z"
     },
     "usReleases": {
       "events": [
@@ -162,41 +157,41 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-23T15:31:49.930Z"
+      "checkedAt": "2026-11-24T15:25:33.511Z"
     },
     "news": {
       "list": [
         {
-          "title": "Goldman: ужесточение условий может повлиять на ФРС",
+          "title": "Иран: переговоров с США не будет до выполнения семи условий",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3481764",
-          "time": "2026-11-23T12:13:20.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3483764",
+          "time": "2026-11-24T13:52:57.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Рынки: пять ключевых событий на предстоящей неделе",
+          "title": "Грин из Банка Англии: Британии нужно ускорить повышение ставок",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3481422",
-          "time": "2026-11-23T10:07:52.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3483760",
+          "time": "2026-11-24T13:47:20.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Деловая активность Британии в ноябре замедлилась, но превысила прогноз",
+          "title": "Деловые настроения в Германии улучшились в ноябре",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-3481415",
-          "time": "2026-11-23T09:44:09.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3483032",
+          "time": "2026-11-24T09:49:01.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Рост еврозоны в ноябре стабилен, несмотря на спад во Франции",
+          "title": "Рост частного сектора Японии замедлился до минимума за полгода",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3481409",
-          "time": "2026-11-23T09:35:13.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3483029",
+          "time": "2026-11-24T09:47:32.000Z",
           "source": "Investing.com"
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-23T15:31:44.663Z"
+      "checkedAt": "2026-11-24T15:25:27.380Z"
     }
   }
 }
