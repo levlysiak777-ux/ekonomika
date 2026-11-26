@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-25T15:09:23.308Z",
+  "generatedAt": "2026-11-26T14:36:45.690Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-25T15:09:02.308Z"
+      "checkedAt": "2026-11-26T14:36:13.436Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-25T15:09:02.683Z"
+      "checkedAt": "2026-11-26T14:36:13.923Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-25T15:09:03.021Z"
+      "checkedAt": "2026-11-26T14:36:14.452Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-25T15:09:03.033Z"
+      "checkedAt": "2026-11-26T14:36:14.235Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-25T15:09:02.709Z"
+      "checkedAt": "2026-11-26T14:36:13.847Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-25T15:09:04.961Z"
+      "checkedAt": "2026-11-26T14:36:18.040Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-25T15:09:23.305Z"
+      "checkedAt": "2026-11-26T14:36:45.688Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-25T15:09:03.092Z"
+      "checkedAt": "2026-11-26T14:36:13.908Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-25T15:09:02.687Z"
+      "checkedAt": "2026-11-26T14:36:13.675Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-25T15:09:02.729Z"
+      "checkedAt": "2026-11-26T14:36:13.795Z"
     },
     "euReleases": {
       "events": [
@@ -123,7 +123,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-25T15:09:03.103Z"
+      "checkedAt": "2026-11-26T14:36:14.397Z"
     },
     "earnings": {
       "events": [
@@ -136,67 +136,67 @@
           "date": "2026-12-09",
           "name": "Broadcom",
           "when": "после закрытия биржи в США"
+        },
+        {
+          "date": "2026-12-10",
+          "name": "Costco Wholesale",
+          "when": "после закрытия биржи в США"
         }
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-25T15:09:05.397Z"
+      "checkedAt": "2026-11-26T14:36:14.178Z"
     },
     "usReleases": {
       "events": [
         {
+          "date": "2026-12-10",
+          "title": "Инфляция в США (CPI)",
+          "hint": "Насколько подорожали товары и услуги. От этого зависят решения ФРС."
+        },
+        {
           "date": "2026-12-04",
           "title": "Рынок труда США",
           "hint": "Безработица и сколько новых рабочих мест появилось за месяц."
-        },
-        {
-          "date": "2026-11-25",
-          "title": "ВВП США",
-          "hint": "Насколько выросла или сжалась экономика США за квартал."
-        },
-        {
-          "date": "2026-11-25",
-          "title": "Расходы американцев и инфляция PCE",
-          "hint": "Сколько тратят люди и как растут цены. Эту инфляцию ФРС смотрит в первую очередь."
         }
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-25T15:09:02.902Z"
+      "checkedAt": "2026-11-26T14:36:20.252Z"
     },
     "news": {
       "list": [
         {
-          "title": "Инфляция в США выросла на 3,8% г/г в октябре, показал индекс PCE",
+          "title": "ЕЦБ: многие члены совета были готовы повысить ставку в октябре",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-3485238",
-          "time": "2026-11-25T13:38:19.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3486229",
+          "time": "2026-11-26T13:41:40.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Греция прогнозирует снижение госдолга до 110% ВВП к 2030 году",
+          "title": "Банк Англии снизит капитал банков, но предупреждает о рисках ИИ",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-93CH-3485197",
-          "time": "2026-11-25T13:25:09.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3486155",
+          "time": "2026-11-26T10:56:11.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Трамп предложил новые пошлины для 14 стран, Китай — 20%",
+          "title": "Индекс потребительского доверия в Германии немного вырос",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3485166",
-          "time": "2026-11-25T13:15:33.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486151",
+          "time": "2026-11-26T10:41:15.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "ВВП Германии в III кв. 2026 года вырос на 0,1%, прогноз снижен",
+          "title": "Розничные продажи в Дании снизились на 0,7% в октябре",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3484687",
-          "time": "2026-11-25T09:36:41.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3485956",
+          "time": "2026-11-26T07:05:45.000Z",
           "source": "Investing.com"
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-25T15:09:03.401Z"
+      "checkedAt": "2026-11-26T14:36:14.759Z"
     }
   }
 }
