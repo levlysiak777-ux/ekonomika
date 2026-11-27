@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T14:36:45.690Z",
+  "generatedAt": "2026-11-27T14:30:33.730Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-26T14:36:13.436Z"
+      "checkedAt": "2026-11-27T14:30:07.314Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-26T14:36:13.923Z"
+      "checkedAt": "2026-11-27T14:30:08.352Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-26T14:36:14.452Z"
+      "checkedAt": "2026-11-27T14:30:08.860Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-26T14:36:14.235Z"
+      "checkedAt": "2026-11-27T14:30:08.873Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-26T14:36:13.847Z"
+      "checkedAt": "2026-11-27T14:30:08.335Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-26T14:36:18.040Z"
+      "checkedAt": "2026-11-27T14:30:13.371Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-26T14:36:45.688Z"
+      "checkedAt": "2026-11-27T14:30:33.729Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-26T14:36:13.908Z"
+      "checkedAt": "2026-11-27T14:30:11.155Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-26T14:36:13.675Z"
+      "checkedAt": "2026-11-27T14:30:11.597Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-26T14:36:13.795Z"
+      "checkedAt": "2026-11-27T14:30:08.514Z"
     },
     "euReleases": {
       "events": [
@@ -123,7 +123,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-26T14:36:14.397Z"
+      "checkedAt": "2026-11-27T14:30:08.810Z"
     },
     "earnings": {
       "events": [
@@ -145,7 +145,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-26T14:36:14.178Z"
+      "checkedAt": "2026-11-27T14:30:09.084Z"
     },
     "usReleases": {
       "events": [
@@ -162,41 +162,41 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-26T14:36:20.252Z"
+      "checkedAt": "2026-11-27T14:30:18.602Z"
     },
     "news": {
       "list": [
         {
-          "title": "ЕЦБ: многие члены совета были готовы повысить ставку в октябре",
+          "title": "ЕЦБ: повышения ставок недостаточно для цели по инфляции в 2%",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3486229",
-          "time": "2026-11-26T13:41:40.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3486741",
+          "time": "2026-11-27T13:02:40.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Банк Англии снизит капитал банков, но предупреждает о рисках ИИ",
+          "title": "Как итоги выборов в Испании повлияют на банки страны?",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3486155",
-          "time": "2026-11-26T10:56:11.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3486660",
+          "time": "2026-11-27T11:33:07.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Индекс потребительского доверия в Германии немного вырос",
+          "title": "Розничные продажи в Ирландии снизились на 0,1%, рост 3,9% за год",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486151",
-          "time": "2026-11-26T10:41:15.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486647",
+          "time": "2026-11-27T11:10:20.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Розничные продажи в Дании снизились на 0,7% в октябре",
+          "title": "Потребительские цены в Бельгии выросли на 5,09% в ноябре",
           "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3485956",
-          "time": "2026-11-26T07:05:45.000Z",
+          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486625",
+          "time": "2026-11-27T10:34:52.000Z",
           "source": "Investing.com"
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-26T14:36:14.759Z"
+      "checkedAt": "2026-11-27T14:30:09.198Z"
     }
   }
 }
