@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-27T14:30:33.730Z",
+  "generatedAt": "2026-11-28T13:47:01.149Z",
   "items": {
     "nbpMeetings": {
       "dates": [
@@ -7,7 +7,7 @@
       ],
       "source": "nbp.pl",
       "url": "https://nbp.pl/polityka-pieniezna/rada-polityki-pienieznej/harmonogram-rpp/",
-      "checkedAt": "2026-11-27T14:30:07.314Z"
+      "checkedAt": "2026-11-28T13:46:38.269Z"
     },
     "nbpRate": {
       "value": 3.75,
@@ -15,7 +15,7 @@
       "prev": null,
       "source": "NBP",
       "url": "https://static.nbp.pl/dane/stopy/stopy_procentowe.xml",
-      "checkedAt": "2026-11-27T14:30:08.352Z"
+      "checkedAt": "2026-11-28T13:46:39.125Z"
     },
     "ecbMeetings": {
       "dates": [
@@ -39,7 +39,7 @@
       ],
       "source": "www.ecb.europa.eu",
       "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
-      "checkedAt": "2026-11-27T14:30:08.860Z"
+      "checkedAt": "2026-11-28T13:46:39.620Z"
     },
     "euInflation": {
       "value": 4,
@@ -48,7 +48,7 @@
       "preliminary": false,
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_minr/default/table",
-      "checkedAt": "2026-11-27T14:30:08.873Z"
+      "checkedAt": "2026-11-28T13:46:39.160Z"
     },
     "fedMeetings": {
       "dates": [
@@ -64,7 +64,7 @@
       ],
       "source": "www.federalreserve.gov",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-      "checkedAt": "2026-11-27T14:30:08.335Z"
+      "checkedAt": "2026-11-28T13:46:39.014Z"
     },
     "ecbRate": {
       "value": 2.5,
@@ -72,7 +72,7 @@
       "prev": 2.25,
       "source": "ECB",
       "url": "https://data.ecb.europa.eu/data/datasets/FM/FM.D.U2.EUR.4F.KR.DFR.LEV",
-      "checkedAt": "2026-11-27T14:30:13.371Z"
+      "checkedAt": "2026-11-28T13:46:39.738Z"
     },
     "plInflation": {
       "value": 3.5,
@@ -80,7 +80,7 @@
       "prev": 4.1,
       "source": "GUS",
       "url": "https://api-dbw.stat.gov.pl/",
-      "checkedAt": "2026-11-27T14:30:33.729Z"
+      "checkedAt": "2026-11-28T13:47:01.143Z"
     },
     "usUnemployment": {
       "period": "2026-10",
@@ -88,7 +88,7 @@
       "prev": 4.2,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/UNRATE",
-      "checkedAt": "2026-11-27T14:30:11.155Z"
+      "checkedAt": "2026-11-28T13:46:39.180Z"
     },
     "fedRate": {
       "value": 4,
@@ -98,7 +98,7 @@
       "prevLow": 3.5,
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU",
-      "checkedAt": "2026-11-27T14:30:11.597Z"
+      "checkedAt": "2026-11-28T13:46:38.828Z"
     },
     "usInflation": {
       "period": "2026-09",
@@ -106,7 +106,7 @@
       "prev": 3.4,
       "source": "FRED (BLS)",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "checkedAt": "2026-11-27T14:30:08.514Z"
+      "checkedAt": "2026-11-28T13:46:38.950Z"
     },
     "euReleases": {
       "events": [
@@ -123,7 +123,7 @@
       ],
       "source": "Eurostat",
       "url": "https://ec.europa.eu/eurostat/web/main/news/release-calendar",
-      "checkedAt": "2026-11-27T14:30:08.810Z"
+      "checkedAt": "2026-11-28T13:46:39.407Z"
     },
     "earnings": {
       "events": [
@@ -145,7 +145,7 @@
       ],
       "source": "Nasdaq",
       "url": "https://www.nasdaq.com/market-activity/earnings",
-      "checkedAt": "2026-11-27T14:30:09.084Z"
+      "checkedAt": "2026-11-28T13:46:40.233Z"
     },
     "usReleases": {
       "events": [
@@ -162,23 +162,37 @@
       ],
       "source": "FRED",
       "url": "https://fred.stlouisfed.org/releases/calendar",
-      "checkedAt": "2026-11-27T14:30:18.602Z"
+      "checkedAt": "2026-11-28T13:46:44.589Z"
     },
     "news": {
       "list": [
         {
-          "title": "ЕЦБ: повышения ставок недостаточно для цели по инфляции в 2%",
+          "title": "Цены на топливо падают по всему миру: передышка для водителей и центробанков",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3486741",
-          "time": "2026-11-27T13:02:40.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3487062",
+          "time": "2026-11-28T12:44:40.000Z",
           "source": "Investing.com"
         },
         {
-          "title": "Как итоги выборов в Испании повлияют на банки страны?",
+          "title": "США отразили дроны на авиабазе в Британии, подозревают Иран",
           "text": null,
-          "url": "https://ru.investing.com/news/economy-news/article-3486660",
-          "time": "2026-11-27T11:33:07.000Z",
+          "url": "https://ru.investing.com/news/economy-news/article-3487041",
+          "time": "2026-11-28T09:01:37.000Z",
           "source": "Investing.com"
+        },
+        {
+          "title": "В Беларуси заблокируют Spotify из-за неуплаты налогов",
+          "text": "Налоговая Беларуси с лета требовала от Spotify уплатить в бюджет НДС по ставке в 20%. С 1 декабря сервис обещают заблокировать.",
+          "url": "https://www.dw.com/ru/в-беларуси-заблокируют-spotify-из-за-неуплаты-налогов/a-80083247?maca=rus-rss-ru-eco-6382-xml-mrss",
+          "time": "2026-11-28T03:25:00.000Z",
+          "source": "DW"
+        },
+        {
+          "title": "Банк Raiffeisen претендует на замороженные активы трейдера из РФ в ЕС",
+          "text": "Банковская группа RBI хочет получить акции стройконцерна Strabag, принадлежащие трейдеру, связанному с Олегом Дерипаской. Ранее российская компания через суд в РФ взыскала у банка около 2,4 млрд евро.",
+          "url": "https://www.dw.com/ru/банк-raiffeisen-претендует-на-замороженные-активы-трейдера-из-рф-в-ес/a-80082951?maca=rus-rss-ru-eco-6382-xml-mrss",
+          "time": "2026-11-27T23:36:00.000Z",
+          "source": "DW"
         },
         {
           "title": "Розничные продажи в Ирландии снизились на 0,1%, рост 3,9% за год",
@@ -186,17 +200,10 @@
           "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486647",
           "time": "2026-11-27T11:10:20.000Z",
           "source": "Investing.com"
-        },
-        {
-          "title": "Потребительские цены в Бельгии выросли на 5,09% в ноябре",
-          "text": null,
-          "url": "https://ru.investing.com/news/economic-indicators/article-93CH-3486625",
-          "time": "2026-11-27T10:34:52.000Z",
-          "source": "Investing.com"
         }
       ],
       "missing": [],
-      "checkedAt": "2026-11-27T14:30:09.198Z"
+      "checkedAt": "2026-11-28T13:46:40.111Z"
     }
   }
 }
